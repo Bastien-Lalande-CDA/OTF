@@ -1,38 +1,28 @@
 ﻿#Requires AutoHotkey v2.0
+#SingleInstance Force
 
-; ==== Init ====
-window_title := "VAPF"
-TraySetIcon("src/pare-feu.png",,)
-window_min_width := 600
-window_min_height := 300
+#Include "src\Controller.ahk"
 
+; VAPF.ahk - Main script for VAPF (Vulnerability Assessment and Penetration Framework)
+; Description: Automated firewall verification and penetration testing framework
+; License: Internal Use Only
 
+; Global Configuration
+global AppVersion := "1.0"
+global AppName := "VAPF"
+global LogFile := A_ScriptDir . "\outputs\logs\vapf.log"
 
+; Main initialization
+Main() {
+    LogMessage("VAPF started - v" . AppVersion)
+    c := Controller()
+    c.startScript()
+}
 
-Window := Gui("+Resize +MinSize" . window_min_width . "x" . window_min_height, window_title)
+LogMessage(msg) {
+    timeStamp := FormatTime(A_Now, "yyyy-MM-dd HH:mm:ss")
+    logEntry := "[" . timeStamp . "] " . msg
+    FileAppend(logEntry . "`n", LogFile)
+}
 
-FontFile := "src/Nulshock Bd.otf"
-
-if FileExist(FontFile) DllCall("Gdi32.dll\AddFontResourceEx", "Str", FontFile, "UInt", 0x10, "UInt", 0)
-
-Window.SetFont("s11", "Nulshock")
-
-db_in_file_path := ""
-
-; ==== Clean Closure ====
-
-Window.OnEvent("Close", (*) => (
-    DllCall("Gdi32.dll\RemoveFontResourceEx", "Str", FontFile, "UInt", 0x10, "UInt", 0),
-    ExitApp()
-))
-
-
-
-
-
-
-
-
-; ==== Main ====
-
-Window.Show("X" . A_ScreenWidth/2 - window_min_width . " Y" . A_ScreenHeight/2 - window_min_height)
+Main()
