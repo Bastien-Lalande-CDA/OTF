@@ -7,6 +7,10 @@ class TestEngine {
         port := data[5]
         protocol := data[6]
 
+        if (data[9] = "") {
+            data[9] := "NOT TESTED"
+        }
+
         found := false
         for index, value in my_ips {
             if (value = source_ip) {
@@ -37,11 +41,12 @@ class TestEngine {
 
         if (output = "True") {
             data[9] := "Success"
-            data[8] := FormatTime(A_Now, "dd/MM/yyyy")
+            
         } else {
             data[9] := "Failed"
-            data[8] := FormatTime(A_Now, "dd/MM/yyyy")
+            LogMessage("Test failed for " . dest_ip . ":" . port . " from " . source_ip)
         }
+        data[8] := FormatTime(A_Now, "dd/MM/yyyy")
 
         return data
     }
