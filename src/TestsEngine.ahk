@@ -18,7 +18,7 @@ class TestEngine {
                 break
             }
         }
-        if (!found && InStr(protocol, "TCP",, 1) = 0) {
+        if (!found || InStr(protocol, "TCP",, 1) = 0) {
             return data
         }
 
@@ -26,16 +26,16 @@ class TestEngine {
 
         output := ""
         try 
-            RunWait(A_ComSpec " /c " cmd " > result.txt",, 0)
+            RunWait(A_ComSpec " /c " cmd " > result.tmp",, 0)
         catch Any as e {
             LogMessage("Error executing command: " . e.Message)
             return
         }
 
         try
-            output := FileRead("result.txt")
+            output := FileRead("result.tmp")
         finally
-            FileDelete("result.txt")
+            FileDelete("result.tmp")
 
         output := Trim(output, " `r`n`t")
 
