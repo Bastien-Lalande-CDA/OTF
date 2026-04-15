@@ -5,6 +5,7 @@ class TestEngine {
         source_ip := data[2]
         dest_ip := data[4]
         port := data[5]
+        protocol := data[6]
 
         found := false
         for index, value in my_ips {
@@ -13,7 +14,7 @@ class TestEngine {
                 break
             }
         }
-        if (!found){
+        if (!found && InStr(protocol, "TCP",, 1) = 0) {
             return data
         }
 
