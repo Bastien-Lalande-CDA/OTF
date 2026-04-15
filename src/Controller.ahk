@@ -46,8 +46,10 @@ class Controller {
 
         this.hmi.initLoadingScreen(totalTests) ; Initialize the loading screen
 
+        my_ips := SysGetIPAddresses()
+
         for i, row in rows {
-            result := this.testEngine.executeTest(row) ; Execute tests on each row of data
+            result := this.testEngine.executeTest(row, my_ips) ; Execute tests on each row of data
             test_results.Push(result)
             this.hmi.updateLoadingScreen(i,totalTests) ; Update the loading screen after each test
         }
