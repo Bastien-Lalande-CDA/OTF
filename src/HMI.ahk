@@ -74,10 +74,12 @@ class HMI extends Object {
         window := this.createWindow()
         window.OnEvent("Close", (*) => ExitApp())
 
-        input := ""
+        output_tab := []
 
-        window.Add("Text",, "Input Matrix Data:")
-        InputDisplay := window.Add("Edit", "w300 r10", "Entrez les données de la matrice ici...")
+        headers := ["source_name","source_ip","destination_name","destination_ip","designation_port","protocol","service_name","last_time_tested","status"]
+        output_tab.Push(headers)
+        input := []
+
         SubmitBtn := window.Add("Button", "xm w390 Default", "Submit")
 
         SubmitBtn.OnEvent("Click", ProcessInput)
@@ -85,17 +87,12 @@ class HMI extends Object {
         window.Show()
 
         ProcessInput(*) {
-            if (InputDisplay.Value = "Entrez les données de la matrice ici...") {
-                MsgBox("Veuillez entrer les données de la matrice avant de soumettre.", "Error", "Icon!")
-            } else {
-                input := InputDisplay.Value
-                window.Hide()
-            }
+            
         }
 
         WinWaitClose(window.Hwnd)
         window.Destroy()
-        return input
+        return output_tab
     }
     showResults(data) {
         window := this.createWindow()
@@ -124,7 +121,7 @@ class HMI extends Object {
 
         lv.ModifyCol()
 
-        CloseBtn := window.Add("Button", "xm w390 Default", "Close")
+        CloseBtn := window.Add("Button", "xm w390 Default", "Enregister les résultats")
         CloseBtn.OnEvent("Click", (*) => window.Hide())
 
         window.Show()
@@ -138,7 +135,7 @@ class HMI extends Object {
         this.window_loading := this.createWindow()
         this.window_loading.OnEvent("Close", (*) => ExitApp())
 
-        this.window_loading.Add("Text", "vProgressText Center", "Progression :     0 / " . totalTests)
+        this.window_loading.Add("Text", "vProgressText w300", "Progression :    0 / " . totalTests)
         progress := this.window_loading.Add("Progress", "vProgressBar w300 h20 cGreen Range-0-" . totalTests, 0)
 
         this.window_loading.Show()

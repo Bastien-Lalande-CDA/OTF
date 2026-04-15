@@ -3,7 +3,7 @@
 
 #Include "src\Controller.ahk"
 
-; VAPF.ahk - Main script for VAPF (Vulnerability Assessment and Penetration Framework)
+; VAPF.ahk - Main script for VAPF (Vérifiaction Automatisé du Pare-Feu)
 ; Description: Automated firewall verification and penetration testing framework
 ; License: Internal Use Only
 
