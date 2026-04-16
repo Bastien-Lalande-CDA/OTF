@@ -26,11 +26,12 @@ class Controller {
 
             csv_path := this.hmi.askPath() ; Ask for CSV file path
             
-            input_data := this.parser.parseCSV(csv_path) ; Parse the CSV file
+            csv_data := this.parser.parseCSV(csv_path) ; Parse the CSV file
+
+            input_data := this.hmi.editMatrixData(csv_data[2]) ; Allow user to edit the parsed data
 
         } else if (data_type = 2) {
-            
-            input_data := this.hmi.askMatrixData() ; Ask for matrix data input
+            input_data := this.hmi.editMatrixData() ; Ask for matrix data input
 
         } else {
             MsgBox("Invalid selection. Please restart the application.")

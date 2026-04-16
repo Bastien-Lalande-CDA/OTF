@@ -2,7 +2,7 @@
 
 class HMI extends Object {
     __Init() {
-        TraySetIcon(A_ScriptDir . "\src\par-feu.png")
+        TraySetIcon(A_ScriptDir . "\src\image\par-feu.png")
         this.window_title := AppName . " - v" . AppVersion
         this.window_height := 300
         this.window_width := 800
@@ -73,31 +73,31 @@ class HMI extends Object {
     getNewEntry(existingData := "") {
 
         ; --- Création de la fenêtre principale ---
-        this.window := this.createWindow()
+        window := this.createWindow()
 
         ; --- Section Saisie (Inputs) ---
-        this.window.Add("GroupBox", "r6 w620", "Ajouter une nouvelle entrée")
+        window.Add("GroupBox", "r6 w620", "Ajouter une nouvelle entrée")
         
-        this.window.Add("Text", "xp+10 yp+25 w80", "Source Name:")
-        EditSrcName := this.window.Add("Edit", "vSrcName x+5 w120")
+        window.Add("Text", "xp+10 yp+25 w80", "Source Name:")
+        EditSrcName := window.Add("Edit", "vSrcName x+5 w120")
         
-        this.window.Add("Text", "x+20 w60", "Source IP:")
-        EditSrcIP   := this.window.Add("Edit", "vSrcIP x+5 w120")
+        window.Add("Text", "x+20 w60", "Source IP:")
+        EditSrcIP   := window.Add("Edit", "vSrcIP x+5 w120")
         
-        this.window.Add("Text", "xm+10 yp+30 w80", "Dest. Name:")
-        EditDstName := this.window.Add("Edit", "vDstName x+5 w120")
+        window.Add("Text", "xm+10 yp+30 w80", "Dest. Name:")
+        EditDstName := window.Add("Edit", "vDstName x+5 w120")
         
-        this.window.Add("Text", "x+20 w60", "Dest. IP:")
-        EditDstIP   := this.window.Add("Edit", "vDstIP x+5 w120")
+        window.Add("Text", "x+20 w60", "Dest. IP:")
+        EditDstIP   := window.Add("Edit", "vDstIP x+5 w120")
 
-        this.window.Add("Text", "xm+10 yp+30 w40", "Port:")
-        EditPort    := this.window.Add("Edit", "vPort x+5 w50")
+        window.Add("Text", "xm+10 yp+30 w40", "Port:")
+        EditPort    := window.Add("Edit", "vPort x+5 w50")
         
-        this.window.Add("Text", "x+15 w60", "Protocol:")
-        DDLProto    := this.window.Add("DropDownList", "vProtocol x+5 w70", ["TCP", "UDP", "ICMP", "TCP/UDP"])
+        window.Add("Text", "x+15 w60", "Protocol:")
+        DDLProto    := window.Add("DropDownList", "vProtocol x+5 w70", ["TCP", "UDP", "ICMP", "TCP/UDP"])
         
-        this.window.Add("Text", "x+15 w50", "Service:")
-        EditService := this.window.Add("Edit", "vService x+5 w100")
+        window.Add("Text", "x+15 w50", "Service:")
+        EditService := window.Add("Edit", "vService x+5 w100")
 
         ; --- Logique de pré-remplissage ---
         if (IsObject(existingData)) {
@@ -120,10 +120,10 @@ class HMI extends Object {
             DDLProto.Choose(1)
         }
 
-        BtnAdd := this.window.Add("Button", "Default xm+10 yp+40 w100 h30", "OK")
+        BtnAdd := window.Add("Button", "Default xm+10 yp+40 w100 h30", "OK")
         BtnAdd.OnEvent("Click", AddEntry)
 
-        this.window.Show()
+        window.Show()
 
         ; --- Fonctions internes ---
 
@@ -158,14 +158,19 @@ class HMI extends Object {
                 return
             }
 
-            this.window.Hide()
+            window.Hide()
         }
 
-        WinWaitClose(this.window.Hwnd)
+        WinWaitClose(window.Hwnd)
+
+        if (EditSrcIP.Value = "" || EditDstIP.Value = "" || EditPort.Value = "" || DDLProto.Text = "") {
+            return false
+        }
+
         return [EditSrcName.Value, EditSrcIP.Value, EditDstName.Value, EditDstIP.Value, EditPort.Value, DDLProto.Text, EditService.Value, "NOT TESTED"]
     }
 
-    askMatrixData() {
+    editMatrixData(input_data := []) {
         headers := ["source_name","source_ip","destination_name","destination_ip","designation_port","protocol","service_name","status"]
 
         tab_headers := headers.Clone()
@@ -175,6 +180,10 @@ class HMI extends Object {
 
         ; Ajout de -ReadOnly pour plus de flexibilité (optionnel)
         LV := window.Add("ListView", "r15 w600 Grid -Multi -ReadOnly", tab_headers)
+
+        for row in input_data {
+            LV.Add(, row*) ; Le * permet de décomposer le tableau en paramètres individuels
+        }
 
         ; --- Boutons de contrôle ---
         window.Add("Button", "w120", "Ajouter").OnEvent("Click", (*) => AddRow())
