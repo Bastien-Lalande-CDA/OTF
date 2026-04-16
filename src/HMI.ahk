@@ -178,6 +178,7 @@ class HMI extends Object {
         for row in input_data {
             LV.Add(, row*)
         }
+        LV.ModifyCol()
 
         window.Add("Button", "w120", "Ajouter").OnEvent("Click", (*) => AddRow())
         window.Add("Button", "x+10 w120", "Modifier").OnEvent("Click", (*) => EditRow())
