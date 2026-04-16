@@ -62,22 +62,24 @@ class TestEngine {
         if DllCall("ws2_32\WSAStartup", "UShort", 0x0202, "Ptr", WSADATA)
             return false
         
+        ; Création du Socket TCP
         s := DllCall("ws2_32\socket", "Int", 2, "Int", 1, "Int", 6, "Ptr") ; AF_INET, SOCK_STREAM, IPPROTO_TCP
         if (s = -1) {
             DllCall("ws2_32\WSACleanup")
             return false
         }
 
+        ; Setup sockaddr structure
         sockaddr := Buffer(16, 0)
         NumPut("Short", 2, sockaddr, 0)
-        NumPut("UShort", DllCall("ws2_32\htons", "UShort", port), sockaddr, 2)
-        NumPut("UInt", DllCall("ws2_32\inet_addr", "AStr", ip), sockaddr, 4)
+        NumPut("UShort", DllCall("ws2_32\htons", "UShort", port), sockaddr, 2) ; Port
+        NumPut("UInt", DllCall("ws2_32\inet_addr", "AStr", ip), sockaddr, 4) ; IP address
 
         ; Set non-blocking mode
         arg := Buffer(4), NumPut("UInt", 1, arg)
         DllCall("ws2_32\ioctlsocket", "Ptr", s, "Int", 0x8004667E, "Ptr", arg) 
 
-        DllCall("ws2_32\connect", "Ptr", s, "Ptr", sockaddr, "Int", 16)
+        DllCall("ws2_32\connect", "Ptr", s, "Ptr", sockaddr, "Int", 16) ; tentative de connexion non bloquante
 
         ; Setup select() for timeout
         writefds := Buffer(520, 0)  ; fd_set structure: DWORD fd_count + 64 sockets (Ptr each)
@@ -89,6 +91,7 @@ class TestEngine {
 
         res := DllCall("ws2_32\select", "Int", 0, "Ptr", 0, "Ptr", writefds, "Ptr", 0, "Ptr", timeval)
         
+        ; Cleanup
         DllCall("ws2_32\closesocket", "Ptr", s)
         DllCall("ws2_32\WSACleanup")
         return (res > 0)
