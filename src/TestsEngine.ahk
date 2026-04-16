@@ -1,14 +1,14 @@
 #Requires AutoHotkey v2.0
 
 class TestEngine {
-    executeTest(data, my_ips) { ;source_name;source_ip;destination_name;destination_ip;designation_port;protocol;service_name;last_time_tested;status
+    executeTest(data, my_ips) { ;source_name;source_ip;destination_name;destination_ip;designation_port;protocol;service_name;status
         source_ip := data[2]
         dest_ip := data[4]
         port := data[5]
         protocol := data[6]
 
-        if (data[9] = "") {
-            data[9] := "NOT TESTED"
+        if (data[8] = "") {
+            data[8] := "NOT TESTED"
         }
 
         found := false
@@ -19,6 +19,7 @@ class TestEngine {
             }
         }
         if (!found || InStr(protocol, "TCP",, 1) = 0) {
+            data[8] := "NOT TESTED"
             return data
         }
 
@@ -40,13 +41,12 @@ class TestEngine {
         output := Trim(output, " `r`n`t")
 
         if (output = "True") {
-            data[9] := "Success"
+            data[8] := "Success"
             
         } else {
-            data[9] := "Failed"
+            data[8] := "Failed"
             LogMessage("Test failed for " . dest_ip . ":" . port . " from " . source_ip)
         }
-        data[8] := FormatTime(A_Now, "dd/MM/yyyy")
 
         return data
     }

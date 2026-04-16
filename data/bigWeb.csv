@@ -1,4 +1,4 @@
-source_name;source_ip;destination_name;destination_ip;designation_port;protocol;service_name;last_time_tested;status
-UC50662;10.21.221.128;google;172.217.22.14;9000;TCP;HTTPS;;
-UC50662;10.21.221.128;cloudflare;104.16.132.229;443;TCP;HTTPS;10/04/2026;NOT TESTED
-UC50662;10.21.221.128;apple;17.253.144.10;443;TCP;HTTPS;10/04/2026;NOT TESTED
+source_name;source_ip;destination_name;destination_ip;designation_port;protocol;service_name;status
+UC50662;10.21.221.128;google;172.217.22.14;9000;TCP;HTTPS;
+UC50662;10.21.221.128;cloudflare;104.16.132.229;443;TCP;HTTPS;NOT TESTED
+UC50662;10.21.221.128;apple;17.253.144.10;443;TCP;HTTPS;NOT TESTED
