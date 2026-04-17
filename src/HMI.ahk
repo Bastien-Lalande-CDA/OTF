@@ -250,20 +250,20 @@ class HMI extends Object {
 
         rows := data[2]
 
-        SortArray(rows, CompareStatus)
+        SortArray(rows, CompareStatus, 8)
 
-        CompareStatus(a, b) {
-            order := Map("Success", 4, "Sent/Open", 3, "Failed", 2, "NOT TESTED (IP MISMATCH)", 1)
-            return order[a[8]] - order[b[8]]
+        CompareStatus(a, b, col) {
+            order := Map("Success", 1, "Sent/Open", 2, "Failed", 3, "NOT TESTED (IP MISMATCH)", 4)
+            return order[a[col]] - order[b[col]]
         }
 
-        SortArray(arr, cmp) {
+        SortArray(arr, cmp, col) {
             len := arr.Length
             Loop len - 1 {
                 i := A_Index
                 Loop len - i {
                     j := A_Index
-                    if (cmp(arr[j], arr[j+1]) > 0) {
+                    if (cmp(arr[j], arr[j+1], col) > 0) {
                         temp := arr[j]
                         arr[j] := arr[j+1]
                         arr[j+1] := temp
@@ -283,7 +283,7 @@ class HMI extends Object {
         main_txt := "Date: " . FormatTime(A_Now, 'yyyy-MM-dd') . "  |  " . nb_of_success . "/"  . rows.Length . " tests réussis [" . Format("{:.2f}", (nb_of_success / rows.Length) * 100) . "%]"
         window.Add("Text",, main_txt)
 
-        lv := window.Add("ListView", "r20 w800 Grid Sort", headers)
+        lv := window.Add("ListView", "r20 w800 Grid NoSortHdr NoSort", headers)
 
         lv.Opt("-Redraw")
         for rowData in rows {
