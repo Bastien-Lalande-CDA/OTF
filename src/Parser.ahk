@@ -25,6 +25,17 @@ class Parser extends Object {
             
             dataArray.Push(rowObject)
         }
+
+        
+
+        expexted_headers := ["source_name","source_ip","destination_name","destination_ip","designation_port","protocol","service_name","status"]
+
+        ; trim each head off headers
+        for index, header in headers {
+            if (header != expexted_headers[index]){
+                return false
+            }
+        }
         return [headers, dataArray]
     }
 }

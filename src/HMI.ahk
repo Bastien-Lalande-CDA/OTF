@@ -10,7 +10,7 @@ class HMI extends Object {
     createWindow() {
         this.Window := Gui("-MinimizeBox -MaximizeBox", this.window_title)
 
-        this.Window.Add("Picture", "h50 w-1", A_ScriptDir . "\src\image\logo-chantiers-atlantique.png")
+        this.Window.Add("Picture", "h20 w-1", A_ScriptDir . "\src\image\logo-chantiers-atlantique.png")
 
         return this.Window
     }
@@ -166,7 +166,7 @@ class HMI extends Object {
     }
 
     editMatrixData(input_data := []) {
-        headers := ["nom_source","ip_source","nom_destination","ip_destination","port","protocole","nom_service","statut"]
+        headers := ["source_name","source_ip","destination_name","destination_ip","designation_port","protocol","service_name","status"]
 
         tab_headers := headers.Clone()
         tab_headers.RemoveAt(tab_headers.Length)
@@ -247,11 +247,35 @@ class HMI extends Object {
         window.OnEvent("Close", (*) => ExitApp())
 
         headers := data[1]
+
         rows := data[2]
+
+        SortArray(rows, CompareStatus)
+
+        CompareStatus(a, b) {
+            order := Map("Success", 4, "Sent/Open", 3, "Failed", 2, "NOT TESTED (IP MISMATCH)", 1)
+            return order[a[8]] - order[b[8]]
+        }
+
+        SortArray(arr, cmp) {
+            len := arr.Length
+            Loop len - 1 {
+                i := A_Index
+                Loop len - i {
+                    j := A_Index
+                    if (cmp(arr[j], arr[j+1]) > 0) {
+                        temp := arr[j]
+                        arr[j] := arr[j+1]
+                        arr[j+1] := temp
+                    }
+                }
+            }
+        }
+    
 
         nb_of_success := 0
         for row in rows {
-            if (row[8] = "Succès") {
+            if (row[8] = "Success") {
                 nb_of_success++
             }
         }
@@ -259,7 +283,7 @@ class HMI extends Object {
         main_txt := "Date: " . FormatTime(A_Now, 'yyyy-MM-dd') . "  |  " . nb_of_success . "/"  . rows.Length . " tests réussis [" . Format("{:.2f}", (nb_of_success / rows.Length) * 100) . "%]"
         window.Add("Text",, main_txt)
 
-        lv := window.Add("ListView", "r20 w800 Grid", headers)
+        lv := window.Add("ListView", "r20 w800 Grid Sort", headers)
 
         lv.Opt("-Redraw")
         for rowData in rows {

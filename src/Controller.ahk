@@ -24,9 +24,20 @@ class Controller {
 
         if (data_type = 1) {
 
-            csv_path := this.hmi.askPath() ; Ask for CSV file path
+            conform_csv_col := false
+
+            while (!conform_csv_col) {
+                csv_path := this.hmi.askPath() ; Ask for CSV file path
             
-            csv_data := this.parser.parseCSV(csv_path) ; Parse the CSV file
+                csv_data := this.parser.parseCSV(csv_path) ; Parse the CSV file
+
+                if (csv_data) {
+                    conform_csv_col := true
+                } else {
+                    MsgBox("Fichier au mauvais format ou introuvable. Veuillez réessayer.", "Erreur", "Icon!")
+                    LogMessage("File not conform at path: " . csv_path)
+                }
+            }
 
             input_data := this.hmi.editMatrixData(csv_data[2]) ; Allow user to edit the parsed data
 
