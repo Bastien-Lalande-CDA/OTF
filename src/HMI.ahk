@@ -20,7 +20,7 @@ class HMI extends Object {
         
         window.Add("Text", "", "Sélectionez une option :")
         radio1 := window.Add("Radio", "vDataType1 Checked", "Importer une matrice de flux (CSV)")
-        radio2 := window.Add("Radio", "vDataType2", "Editer une matrice de flux")
+        radio2 := window.Add("Radio", "vDataType2", "Créer une nouvelle matrice de flux")
         btn := this.Window.Add("Button", "xm w390 Default", "OK")
 
         btn.OnEvent("Click", (*) => window.Hide())
