@@ -95,7 +95,7 @@ class HMI extends Object {
         EditPort    := window.Add("Edit", "vPort x+5 w50")
         
         window.Add("Text", "x+15 w60", "Protocole:")
-        DDLProto    := window.Add("DropDownList", "vProtocol x+5 w70", ["TCP", "UDP", "ICMP", "TCP/UDP"])
+        DDLProto    := window.Add("DropDownList", "vProtocol x+5 w70", ["TCP", "UDP", "ICMP"])
         
         window.Add("Text", "x+15 w50", "Service:")
         EditService := window.Add("Edit", "vService x+5 w100")
