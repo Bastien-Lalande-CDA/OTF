@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 
+#Include Globals.ahk
+
 class HMI extends Object {
     __Init() {
         TraySetIcon(A_ScriptDir . "\src\image\par-feu.png")

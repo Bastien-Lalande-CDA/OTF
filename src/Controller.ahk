@@ -1,9 +1,10 @@
 #Requires AutoHotkey v2.0
 
-#Include "HMI.ahk"
-#Include "Parser.ahk"
-#Include "Register.ahk"
-#Include "TestsEngine.ahk"
+#Include HMI.ahk
+#Include Parser.ahk
+#Include Register.ahk
+#Include TestsEngine.ahk
+#Include Globals.ahk
 
 
 class Controller {
@@ -12,7 +13,7 @@ class Controller {
         this.hmi := HMI()
         this.parser := Parser()
         this.register := Register()
-        this.testEngine := TestEngine()
+        this.testEngine := TestsEngine()
         
         this.runWorkflow()
     }

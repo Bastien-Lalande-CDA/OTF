@@ -1,30 +1,36 @@
 #Requires AutoHotkey v2.0
 
-desordered_rows := [
-    ["source_name1","source_ip1","destination_name1","destination_ip1","designation_port1","protocol1","service_name1","Succès"],
-    ["source_name2","source_ip2","destination_name2","destination_ip2","designation_port2","protocol2","service_name2","Échec"],
-    ["source_name3","source_ip3","destination_name3","destination_ip3","designation_port3","protocol3","service_name3","Succès"],
-    ["source_name4","source_ip4","destination_name4","destination_ip4","designation_port4","protocol4","service_name4","Échec"]
-]
+; ===== Test_Parser.ahk =====
+#Include TestsFramework.ahk
+#Include ../src/Parser.ahk
 
-SortArray(desordered_rows, CompareStatus)
+Test_Parse_ValidCSV() {
+    parser := Parser()
+    
+    csv := "
+    (
+    source_name;source_ip;destination_name;destination_ip;designation_port;protocol;service_name;status
+    A;1.1.1.1;B;2.2.2.2;80;TCP;HTTP;
+    )"
 
-CompareStatus(a, b) {
-    order := Map("Succès", 1, "Échec", 2, "Échec", 2, "Échec", 2)
-    return order[a[8]] - order[b[8]]
+    result := parser.ParseFromString(csv)
+
+    Assert.True(result.Length > 0, "Le parser doit retourner des lignes")
+    Assert.Equal("TCP", result[1].protocol)
 }
 
-SortArray(arr, cmp) {
-    len := arr.Length
-    Loop len - 1 {
-        i := A_Index
-        Loop len - i {
-            j := A_Index
-            if (cmp(arr[j], arr[j+1]) > 0) {
-                temp := arr[j]
-                arr[j] := arr[j+1]
-                arr[j+1] := temp
-            }
-        }
+Test_Parse_InvalidCSV() {
+    parser := Parser()
+
+    csv := "bad format"
+
+    try {
+        parser.ParseFromString(csv)
+        throw Error("Doit échouer")
+    } catch {
+        Assert.True(true)
     }
 }
+
+RunTest("Parser - CSV valide", Test_Parse_ValidCSV)
+RunTest("Parser - CSV invalide", Test_Parse_InvalidCSV)

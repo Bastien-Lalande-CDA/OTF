@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 
-class TestEngine {
+#Include Globals.ahk
+
+class TestsEngine {
     
     executeTest(data, my_ips) { 
         ; Structure : source_name[1];source_ip[2];dest_name[3];dest_ip[4];port[5];protocol[6];service[7];status[8]
@@ -46,7 +48,6 @@ class TestEngine {
 
         data[8] := status
         
-        ; Using a helper for logging (ensure LogMessage is defined elsewhere in your script)
         if (status != "Success" && status != "Sent/Open") {
             try LogMessage("Test " . protocol . " failed for " . dest_ip . ":" . port)
         }
