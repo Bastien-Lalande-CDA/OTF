@@ -3,16 +3,16 @@
 
 #Include "src\Controller.ahk"
 
-; VAPF.ahk - Main script for VAPF (Vérifiaction Automatisé du Pare-Feu)
+; OTF.ahk - Main script for OTF (Outil de Test de Flux)
 
 ; Global Configuration
 global AppVersion := "1.0"
-global AppName := "VAPF"
-global LogFile := A_ScriptDir . "\outputs\logs\vapf.log"
+global AppName := "OTF"
+global LogFile := A_ScriptDir . "\outputs\logs\otf.log"
 
 ; Main initialization
 Main() {
-    LogMessage("VAPF started - v" . AppVersion)
+    LogMessage("OTF started - v" . AppVersion)
     c := Controller()
     c.startScript()
 }

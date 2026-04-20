@@ -274,13 +274,20 @@ class HMI extends Object {
     
 
         nb_of_success := 0
+        nb_of_fail := 0
         for row in rows {
             if (row[8] = "Success") {
                 nb_of_success++
             }
+            if (row[8] = "Failed") {
+                nb_of_fail++
+            }
         }
 
-        main_txt := "Date: " . FormatTime(A_Now, 'yyyy-MM-dd') . "  |  " . nb_of_success . "/"  . rows.Length . " tests réussis [" . Format("{:.2f}", (nb_of_success / rows.Length) * 100) . "%]"
+        main_txt := "Date: " 
+        . FormatTime(A_Now, 'yyyy-MM-dd') . "  |  " 
+        . nb_of_success . "/"  . rows.Length . " tests réussis [" . Format("{:.2f}", (nb_of_success / rows.Length) * 100) . "%]" . "  |  " 
+        . nb_of_fail . "/"  . rows.Length . " échecs [" . Format("{:.2f}", (nb_of_fail / rows.Length) * 100) . "%]"
         window.Add("Text",, main_txt)
 
         lv := window.Add("ListView", "r20 w800 Grid NoSortHdr NoSort", headers)

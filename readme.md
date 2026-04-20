@@ -1,12 +1,12 @@
 ![Logo chantiers de l'atantique](/src/image/logo-chantiers-atlantique.svg)
 
-# Documentation du Script : VAPF (Vérification Automatisée du Pare-Feu)
+# Documentation du Script : OTF (Outil de Test de Flux)
 
 ## Présentation Générale
 
-Le script **VAPF** est un outil d'audit réseau conçu pour automatiser la vérification des règles de filtrage (pare-feu). Son objectif principal est de valider que l'état réel des flux réseau correspond aux autorisations définies dans une **matrice de flux**.
+Le script **OTF** est un outil d'audit réseau conçu pour automatiser la vérification des règles de filtrage (pare-feu). Son objectif principal est de valider que l'état réel des flux réseau correspond aux autorisations définies dans une **matrice de flux**.
 
-Dans les environnements complexes, la conformité des règles de pare-feu est critique. VAPF permet de détecter automatiquement les écarts entre la configuration attendue et le comportement réel du réseau.
+Dans les environnements complexes, la conformité des règles de pare-feu est critique. OTF permet de détecter automatiquement les écarts entre la configuration attendue et le comportement réel du réseau.
 
 ---
 

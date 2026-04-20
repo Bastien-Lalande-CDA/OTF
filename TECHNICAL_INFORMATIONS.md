@@ -1,6 +1,6 @@
 ![Logo chantiers de l'atantique](/src/image/logo-chantiers-atlantique.svg)
 
-# Documentation technique du Script : VAPF (Vérification Automatisée du Pare-Feu)
+# Documentation technique du Script : OTF (Outil de Test de Flux)
 
 ## Architecture du Script
 
@@ -61,7 +61,7 @@ La colonne `status` est complétée après exécution :
 * **Success** : Le flux est accessible et conforme
 * **Failed** : Le flux est bloqué ou inaccessible
 * **NOT TESTED (IP MISMATCH)** : Test non exécuté (la machine locale ne correspond pas à la source)
-* **Sent/Open** : Paquet envoyé ou port ouvert (cas spécifique selon protocole)
+* **Sent/Open** : Paquet UDP envoyé (ne garantis pas la comunication dit juste qu' paquet a été envoyer avec succès)
 
 ---
 
