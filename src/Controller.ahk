@@ -8,6 +8,13 @@
 
 
 class Controller {
+
+    __New(parser := "", engine := "", register := "") {
+        this.parser := parser ? parser : Parser()
+        this.engine := engine ? engine : TestsEngine()
+        this.register := register ? register : Register()
+    }
+
     startScript() {
         ; Initialize components
         this.hmi := HMI()

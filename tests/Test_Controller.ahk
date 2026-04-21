@@ -2,7 +2,7 @@
 
 ; ===== Test_Controller.ahk =====
 #Include ../src/Controller.ahk
-#Include TestsFramework.ahk
+#Include ../Lib/Yunit/Yunit.ahk
 
 class FakeParser {
     Parse() {
@@ -19,23 +19,26 @@ class FakeEngine {
 }
 
 class FakeRegister {
-    results := []
+    __New() {
+        this.results := []
+    }
 
     Add(result) {
         this.results.Push(result)
     }
 }
 
-Test_Controller_Flow() {
-    controller := Controller()
+class Test_Controller {
 
-    controller.parser := FakeParser()
-    controller.engine := FakeEngine()
-    controller.register := FakeRegister()
+    Test_Flow() {
+        controller := Controller()
 
-    controller.Run()
+        controller.parser := FakeParser()
+        controller.engine := FakeEngine()
+        controller.register := FakeRegister()
 
-    Assert.True(controller.register.results.Length > 0)
+        controller.Run()
+
+        Yunit.Assert(controller.register.results.Length > 0)
+    }
 }
-
-RunTest("Controller - orchestration", Test_Controller_Flow)
