@@ -11,6 +11,7 @@ class Test_HMI {
 
         formatted := hmi.FormatResult({status: "Success"})
 
-        Yunit.Assert(InStr(formatted, "Success") > 0)
+        if !(InStr(formatted, "Success"))
+            throw Error("Formatted result does not contain 'Success'")
     }
 }

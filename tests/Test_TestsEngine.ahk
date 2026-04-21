@@ -24,20 +24,23 @@ class Test_TestsEngine {
         engine := FakeTestsEngine()
         result := engine.TestTCP("1.1.1.1", 80)
 
-        Yunit.AssertEquals("Success", result)
+        if (result != "Success")
+            throw Error("Expected Success, got " result)
     }
 
     Test_UDP() {
         engine := FakeTestsEngine()
         result := engine.TestUDP("1.1.1.1", 53)
 
-        Yunit.AssertEquals("Sent/Open", result)
+        if (result != "Sent/Open")
+            throw Error("Expected Sent/Open, got " result)
     }
 
     Test_ICMP() {
         engine := FakeTestsEngine()
         result := engine.TestICMP("1.1.1.1")
 
-        Yunit.AssertEquals("Success", result)
+        if (result != "Success")
+            throw Error("Expected Success, got " result)
     }
 }

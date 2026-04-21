@@ -11,7 +11,8 @@ class Test_Register {
 
         reg.Add({status: "Success"})
 
-        Yunit.AssertEquals(1, reg.results.Length)
+        if (reg.results.Length != 1)
+            throw Error("Expected 1 result")
     }
 
     Test_Save_File() {
@@ -20,6 +21,7 @@ class Test_Register {
         reg.Add({status: "Success"})
         path := reg.Save("test.csv")
 
-        Yunit.Assert(FileExist(path))
+        if !FileExist(path)
+            throw Error("File was not created")
     }
 }

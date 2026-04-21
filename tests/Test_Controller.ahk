@@ -39,6 +39,7 @@ class Test_Controller {
 
         controller.Run()
 
-        Yunit.Assert(controller.register.results.Length > 0)
+        if (controller.register.results.Length = 0)
+            throw Error("No results were registered")
     }
 }

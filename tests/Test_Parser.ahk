@@ -17,8 +17,11 @@ class Test_Parser {
 
         result := parser.ParseFromString(csv)
 
-        Yunit.Assert(result.Length > 0)
-        Yunit.AssertEquals("TCP", result[1].protocol)
+        if (result.Length = 0)
+            throw Error("Expected non-empty result")
+
+        if (result[1].protocol != "TCP")
+            throw Error("Expected protocol TCP")
     }
 
     Test_Parse_InvalidCSV() {
@@ -26,9 +29,9 @@ class Test_Parser {
 
         try {
             parser.ParseFromString("invalid")
-            Yunit.Fail("Une erreur était attendue")
+            throw Error("Exception expected but not thrown")
         } catch {
-            Yunit.Assert(true)
+            ; OK
         }
     }
 }
