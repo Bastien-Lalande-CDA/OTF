@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 
 ; Global Configuration
-global AppVersion := "1.0"
+global AppVersion := "2.0"
 global AppName := "OTF"
 global LogFile := A_ScriptDir . "\outputs\logs\otf.log"
 
