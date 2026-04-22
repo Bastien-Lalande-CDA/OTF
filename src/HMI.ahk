@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 
 #Include Globals.ahk
+#Include TCPservers.ahk
 
 class HMI extends Object {
     __Init() {
@@ -23,6 +24,7 @@ class HMI extends Object {
         window.Add("Text", "", "Sélectionez une option :")
         radio1 := window.Add("Radio", "vDataType1 Checked", "Importer une matrice de flux (CSV)")
         radio2 := window.Add("Radio", "vDataType2", "Créer une nouvelle matrice de flux")
+        radio3 := window.Add("Radio", "vDataType3", "Créer un server TCP")
         btn := this.Window.Add("Button", "xm w390 Default", "OK")
 
         btn.OnEvent("Click", (*) => window.Hide())
@@ -35,6 +37,8 @@ class HMI extends Object {
             opt := 1
         } else if (radio2.Value) {
             opt := 2
+        } else if (radio3.Value) {
+            opt := 3
         }
         window.Destroy()
         return opt
@@ -75,7 +79,7 @@ class HMI extends Object {
         window.Destroy()
         return path
     }
-    getNewEntry(existingData := "") {
+    EditMatrixEntry(existingData := "") {
 
         window := this.createWindow()
 
@@ -191,7 +195,7 @@ class HMI extends Object {
         window.Show()
 
         AddRow(*) {
-            data := this.getNewEntry()
+            data := this.EditMatrixEntry()
             if (data) {
                 LV.Add(, data*)
                 LV.ModifyCol()
@@ -209,7 +213,7 @@ class HMI extends Object {
                 CurrentRowData.Push(LV.GetText(RowNum, A_Index))
             }
 
-            newData := this.getNewEntry(CurrentRowData) 
+            newData := this.EditMatrixEntry(CurrentRowData) 
 
             if (newData) {
                 LV.Modify(RowNum, , newData*)
@@ -332,4 +336,190 @@ class HMI extends Object {
             this.window_loading.Destroy()
         }
     }
+
+
+    manageTCPServers() {
+        this.tcpManager := TCPServers()
+        gui := this.createWindow()
+
+        LV_width := 600
+
+        LV := gui.Add("ListView", "w" . LV_width . " h200 Grid -Multi -ReadOnly",
+            ["IP", "Port", "Status"])
+
+        LV.ModifyCol(1, LV_width/3-3)
+        LV.ModifyCol(2, LV_width/3-3)
+        LV.ModifyCol(3, LV_width/3-3)
+
+        btnAdd    := gui.Add("Button", "w100", "Ajouter")
+        btnEdit   := gui.Add("Button", "x+10 w100", "Modifier")
+        btnDelete := gui.Add("Button", "x+10 w100", "Supprimer")
+        btnStart  := gui.Add("Button", "xm w100", "Start")
+        btnStop   := gui.Add("Button", "x+10 w100", "Stop")
+
+        gui.Show()
+
+        ; ===== Actions =====
+
+        AddServer(*) {
+            data := this.EditTCPEntry()
+            row := LV.GetCount()+1
+            if (data) {
+                this.tcpManager.Add(data[1], data[2])
+                LV.Add(, data[1], data[2], (this.tcpManager.servers[row].IsRunning())? "running" : "stopped")
+            }
+        }
+
+        EditServer(*) {
+            if !(row := LV.GetNext(0)) {
+                MsgBox("Sélectionne une ligne")
+                return
+            }
+
+            if (this.tcpManager.servers[row].IsRunning()){
+                MsgBox("Stoppez le serveur")
+                return
+            }
+
+            current := [
+                LV.GetText(row, 1), ; IP
+                LV.GetText(row, 2)  ; Port
+            ]
+
+            data := this.EditTCPEntry(current)
+
+            if (data) {
+                this.tcpManager.Remove(row)
+                this.tcpManager.Insert(data[1], data[2], row)
+                LV.Modify(row, , data[1], data[2], (this.tcpManager.servers[row].IsRunning())? "running" : "stopped")
+            }
+        }
+
+        DeleteServer(*) {
+            if !(row := LV.GetNext(0)) {
+                MsgBox("Sélectionne une ligne")
+                return
+            }
+
+            if (this.tcpManager.servers[row].IsRunning()){
+                MsgBox("Stoppez le serveur")
+                return
+            }
+            
+            this.tcpManager.Remove(row)
+
+            LV.Delete(row)
+        }
+
+        StartServer(*) {
+            if !(row := LV.GetNext(0)){
+                MsgBox("Sélectionne une ligne")
+                return
+            }
+            if (this.tcpManager.servers[row].IsRunning()){
+                return
+            }
+            ; On récupère l'ID en colonne 1 même s'il est invisible
+            ip       := LV.GetText(row, 1)
+            port     := LV.GetText(row, 2)
+
+            try {
+                this.tcpManager.servers[row].Start()
+                LV.Modify(row, , , , (this.tcpManager.servers[row].IsRunning())? "running" : "stopped")
+            } catch Error as e {
+                MsgBox(e.Message . " at line : " . row)
+            }
+        }
+
+        StopServer(*) {
+            if !(row := LV.GetNext(0)){
+                MsgBox("Sélectionne une ligne")
+                return
+            }
+
+            if (!this.tcpManager.servers[row].IsRunning()){
+                return
+            }
+
+            try {
+                this.tcpManager.servers[row].Close()
+                LV.Modify(row, , , , (this.tcpManager.servers[row].IsRunning())? "running" : "stopped")
+            } catch Error as e {
+                MsgBox(e.Message . " at line : " . row)
+            }
+        }
+
+        ; ===== Events =====
+
+        btnAdd.OnEvent("Click", (*) => AddServer())
+        btnEdit.OnEvent("Click", (*) => EditServer())
+        btnDelete.OnEvent("Click", (*) => DeleteServer())
+        btnStart.OnEvent("Click", (*) => StartServer())
+        btnStop.OnEvent("Click", (*) => StopServer())
+
+        WinWaitClose(gui.Hwnd)
+        return true
+    }
+
+    EditTCPEntry(existingData := ["",80]) {
+        window := this.createWindow()
+
+        window.Add("GroupBox", "r4 w300", "Serveur TCP")
+
+        window.Add("Text", "xp+10 yp+25 w40", "IP:")
+        DDLIP := window.Add("DropDownList", "x+5 w150", SysGetIPAddresses())
+
+        window.Add("Text", "xm+10 yp+30 w40", "Port:")
+        EditPort := window.Add("Edit", "x+5 w80")
+
+        ; Pré-remplissage
+        if (IsObject(existingData)) {
+            try DDLIP.Choose(DDLIP.FindString(existingData[1]))
+            catch 
+                DDLIP.Choose(1)
+
+            EditPort.Value := existingData[2]
+        } else {
+            DDLIP.Choose(1)
+        }
+
+        BtnOK := window.Add("Button", "Default xm+10 yp+40 w100", "OK")
+        BtnOK.OnEvent("Click", AddEntry)
+
+        window.Show()
+
+        ; ===== Validation =====
+
+        IsValidIP(ip) {
+            return RegExMatch(ip, "^(\d{1,3}\.){3}\d{1,3}$")
+        }
+
+        AddEntry(*) {
+            if (DDLIP.Text = "" || EditPort.Value = "") {
+                MsgBox("Champs obligatoires manquants")
+                return
+            }
+
+            if (!IsValidIP(DDLIP.Text)) {
+                MsgBox("IP invalide")
+                return
+            }
+
+            if (!RegExMatch(EditPort.Value, "^\d+$") || Number(EditPort.Value) > 65536) {
+                MsgBox("Port invalide")
+                return
+            }
+
+            window.Hide()
+        }
+
+        WinWaitClose(window.Hwnd)
+
+        if (DDLIP.Text = "" || EditPort.Value = "")
+            return false
+
+        return [DDLIP.Text, EditPort.Value]
+    }
 }
+
+

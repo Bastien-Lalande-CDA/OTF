@@ -9,19 +9,14 @@
 
 class Controller {
 
-    __New(parser := "", engine := "", register := "") {
-        this.parser := parser ? parser : Parser()
-        this.engine := engine ? engine : TestsEngine()
-        this.register := register ? register : Register()
+    __New() {
+        this.parser := Parser()
+        this.testEngine := TestsEngine()
+        this.register := Register()
+        this.hmi := HMI()
     }
 
     startScript() {
-        ; Initialize components
-        this.hmi := HMI()
-        this.parser := Parser()
-        this.register := Register()
-        this.testEngine := TestsEngine()
-        
         this.runWorkflow()
     }
     
@@ -51,6 +46,11 @@ class Controller {
 
         } else if (data_type = 2) {
             input_data := this.hmi.editMatrixData() ; Ask for matrix data input
+
+        } else if (data_type = 3) {
+
+            this.hmi.manageTCPServers() ; Manage TCP server creation and data reception
+            ExitApp()
 
         } else {
             MsgBox("Invalid selection. Please restart the application.")
