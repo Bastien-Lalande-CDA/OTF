@@ -362,11 +362,21 @@ class HMI extends Object {
         ; ===== Actions =====
 
         AddServer(*) {
-            data := this.EditTCPEntry()
             row := LV.GetCount()+1
+            data := this.EditTCPEntry()
             if (data) {
-                this.tcpManager.Add(data[1], data[2])
-                LV.Add(, data[1], data[2], (this.tcpManager.servers[row].IsRunning())? "running" : "stopped")
+                row_exist := false
+                for server IN this.tcpManager.servers {
+                    if (server.ip = data[1] && server.port = data[2]) {
+                        row_exist := true
+                    }
+                }
+                if !row_exist {
+                    this.tcpManager.Add(data[1], data[2])
+                    LV.Add(, data[1], data[2], (this.tcpManager.servers[row].IsRunning())? "running" : "stopped")
+                } else {
+                    MsgBox("Ce serveur TCP existe déja")
+                }
             }
         }
 
