@@ -168,3 +168,62 @@ class TCPServer {
         return ((p & 0xFF) << 8) | ((p >> 8) & 0xFF)
     }
 }
+
+class SocketManager {
+    GetListeningSockets() {
+        result := []
+
+        AF_INET := 2
+        TCP_TABLE_OWNER_PID_LISTENER := 3
+
+        size := 0
+
+        ; Taille nécessaire
+        DllCall("iphlpapi\GetExtendedTcpTable"
+            , "ptr", 0
+            , "uint*", &size
+            , "int", false
+            , "int", AF_INET
+            , "int", TCP_TABLE_OWNER_PID_LISTENER
+            , "uint", 0)
+
+        buf := Buffer(size, 0)
+
+        ; Récupération des données
+        if DllCall("iphlpapi\GetExtendedTcpTable"
+            , "ptr", buf
+            , "uint*", &size
+            , "int", false
+            , "int", AF_INET
+            , "int", TCP_TABLE_OWNER_PID_LISTENER
+            , "uint", 0) != 0
+        {
+            return result
+        }
+
+        numEntries := NumGet(buf, 0, "uint")
+        offset := 4
+
+        loop numEntries {
+            state      := NumGet(buf, offset + 0, "uint")
+            localAddr  := NumGet(buf, offset + 4, "uint")
+            localPort  := NumGet(buf, offset + 8, "uint")
+
+            ; IP
+            ip := Format("{:d}.{:d}.{:d}.{:d}"
+                , localAddr & 0xFF
+                , (localAddr >> 8) & 0xFF
+                , (localAddr >> 16) & 0xFF
+                , (localAddr >> 24) & 0xFF)
+
+            ; Port (network -> host)
+            port := ((localPort >> 8) & 0xFF) | ((localPort & 0xFF) << 8)
+
+            result.Push({ ip: ip, port: port })
+
+            offset += 24
+        }
+
+        return result
+    }
+}

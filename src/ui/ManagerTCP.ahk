@@ -101,15 +101,25 @@ class ManagerTCP extends WindowOTF {
         return [DDLIP.Text, EditPort.Value]
     }
     ManageTCPServers() {
+        
+        for sock in SocketManager().GetListeningSockets() {
+            this.AddServer(sock.ip, sock.port)
+        }
 
         LV_width := 600
 
-        LV := this.Add("ListView", "w" . LV_width . " h200 Grid -Multi -ReadOnly",
+        LV := this.Add("ListView", "w" . LV_width . " h200 Grid -Multi -ReadOnly 0x8000",
             ["IP", "Port", "Status"])
 
-        LV.ModifyCol(1, LV_width/3-3)
-        LV.ModifyCol(2, LV_width/3-3)
-        LV.ModifyCol(3, LV_width/3-3)
+        LV.ModifyCol(1, LV_width // 3-3)
+        LV.ModifyCol(2, LV_width // 3-3)
+        LV.ModifyCol(3, LV_width // 3-3)
+
+        other_service_use_port_text := "An other service use this port"
+
+        for server IN this.servers {
+            LV.Add(, server.ip, server.port, other_service_use_port_text)
+        }
 
         btnAdd    := this.Add("Button", "w100", "Ajouter")
         btnEdit   := this.Add("Button", "x+10 w100", "Modifier")
@@ -127,7 +137,7 @@ class ManagerTCP extends WindowOTF {
             if (data) {
                 row_exist := false
                 for server IN this.servers {
-                    if (server.ip = data[1] && server.port = data[2]) {
+                    if (server.port = data[2]) {
                         row_exist := true
                     }
                 }
@@ -135,7 +145,7 @@ class ManagerTCP extends WindowOTF {
                     this.AddServer(data[1], data[2])
                     LV.Add(, data[1], data[2], (this.servers[row].IsRunning())? "running" : "stopped")
                 } else {
-                    MsgBox("Ce serveur TCP existe déja")
+                    MsgBox("Ce port est déja utilisé")
                 }
             }
         }
@@ -143,6 +153,11 @@ class ManagerTCP extends WindowOTF {
         EditServer(*) {
             if !(row := LV.GetNext(0)) {
                 MsgBox("Sélectionne une ligne")
+                return
+            }
+
+            if (LV.GetText(row, 3) = other_service_use_port_text) {
+                MsgBox("Vous ne pouvez pas utilisé cela, un autre service utilise ce port")
                 return
             }
 
@@ -171,6 +186,11 @@ class ManagerTCP extends WindowOTF {
                 return
             }
 
+            if (LV.GetText(row, 3) = other_service_use_port_text) {
+                MsgBox("Vous ne pouvez pas utilisé cela, un autre service utilise ce port")
+                return
+            }
+
             if (this.servers[row].IsRunning()){
                 MsgBox("Stoppez le serveur")
                 return
@@ -186,9 +206,16 @@ class ManagerTCP extends WindowOTF {
                 MsgBox("Sélectionne une ligne")
                 return
             }
+
+            if (LV.GetText(row, 3) = other_service_use_port_text) {
+                MsgBox("Vous ne pouvez pas utilisé cela, un autre service utilise ce port")
+                return
+            }
+
             if (this.servers[row].IsRunning()){
                 return
             }
+
             ; On récupère l'ID en colonne 1 même s'il est invisible
             ip       := LV.GetText(row, 1)
             port     := LV.GetText(row, 2)
@@ -207,7 +234,8 @@ class ManagerTCP extends WindowOTF {
                 return
             }
 
-            if (!this.servers[row].IsRunning()){
+            if (LV.GetText(row, 3) = other_service_use_port_text) {
+                MsgBox("Vous ne pouvez pas utilisé cela, un autre service utilise ce port")
                 return
             }
 
