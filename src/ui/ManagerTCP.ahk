@@ -4,45 +4,96 @@
 #Include ../services/TCPserver.ahk
 
 class ManagerTCP extends WindowOTF {
-
     servers := []
 
+    /**
+     * @description Adds a new TCP server to the servers list.
+     * @param {String} [ip="0.0.0.0"] - IP address for the server.
+     * @param {Number} [port=80] - Port for the server.
+     * @returns {TCPServer} - The created TCP server instance.
+     * @example <caption>Add a new TCP server.</caption>
+     * server := ManagerTCP().AddServer("192.168.1.1", 8080)
+     */
     AddServer(ip := "0.0.0.0", port := 80) {
-        if (this.servers.Has(ip) && this.servers.Has(port))
-            LogMessage("Server with this name already exists")
+        LogMessage("ManagerTCP.AddServer() started. Params: ip=" . ip . ", port=" . port)
+        if (this.servers.Has(ip) && this.servers.Has(port)) {
+            LogMessage("ERROR: Server with this IP and port already exists.")
+        }
 
         server := TCPServer(ip, port)
         this.servers.Push(server)
+        LogMessage("ManagerTCP.AddServer() completed. Server added.")
         return server
     }
 
+    /**
+     * @description Inserts a new TCP server at a specific index in the servers list.
+     * @param {String} [ip="0.0.0.0"] - IP address for the server.
+     * @param {Number} [port=80] - Port for the server.
+     * @param {Number} [index=1] - Index at which to insert the server.
+     * @returns {TCPServer} - The created TCP server instance.
+     * @example <caption>Insert a new TCP server at index 1.</caption>
+     * server := ManagerTCP().InsertServer("192.168.1.1", 8080, 1)
+     */
     InsertServer(ip := "0.0.0.0", port := 80, index := 1) {
-        if (this.servers.Has(ip) && this.servers.Has(port))
-            LogMessage("Server with this name already exists")
+        LogMessage("ManagerTCP.InsertServer() started. Params: ip=" . ip . ", port=" . port . ", index=" . index)
+        if (this.servers.Has(ip) && this.servers.Has(port)) {
+            LogMessage("ERROR: Server with this IP and port already exists.")
+        }
 
         server := TCPServer(ip, port)
         this.servers.InsertAt(index, server)
+        LogMessage("ManagerTCP.InsertServer() completed. Server inserted at index " . index)
         return server
     }
 
+    /**
+     * @description Retrieves a server by its ID.
+     * @param {Number} id - The index of the server in the servers list.
+     * @returns {TCPServer|void} - The server instance if found, otherwise undefined.
+     * @example <caption>Get server at index 0.</caption>
+     * server := ManagerTCP().GetServer(0)
+     */
     GetServer(id) {
-        if !this.servers.Has(id)
-            LogMessage("No server found with this id")
+        LogMessage("ManagerTCP.GetServer() started. Params: id=" . id)
+        if !this.servers.Has(id) {
+            LogMessage("ERROR: No server found with this id: " . id)
+        }
 
+        LogMessage("ManagerTCP.GetServer() completed.")
         return this.servers[id]
     }
 
+    /**
+     * @description Removes a server by its ID and closes its socket.
+     * @param {Number} id - The index of the server in the servers list.
+     * @returns {void}
+     * @example <caption>Remove server at index 0.</caption>
+     * ManagerTCP().RemoveServer(0)
+     */
     RemoveServer(id) {
-        if !this.servers.Has(id)
-            LogMessage("No server found with this id")
+        LogMessage("ManagerTCP.RemoveServer() started. Params: id=" . id)
+        if !this.servers.Has(id) {
+            LogMessage("ERROR: No server found with this id: " . id)
+        }
 
         this.servers[id].Close()
         this.servers.RemoveAt(id)
+        LogMessage("ManagerTCP.RemoveServer() completed. Server removed and closed.")
     }
-    
+
+    /**
+     * @description Opens a dialog for adding or editing a TCP server entry (IP and port).
+     * @param {Array|String} [existingData=["",80]] - Optional existing data to pre-fill the form.
+     * @returns {Array|Boolean} - Array of [ip, port] if valid, or `false` if cancelled.
+     * @example <caption>Edit a TCP server entry.</caption>
+     * tcpData := ManagerTCP().EditTCPEntry(["192.168.1.1", 8080])
+     */
     EditTCPEntry(existingData := ["",80]) {
+        LogMessage("ManagerTCP.EditTCPEntry() started. Params: existingData=" . (IsObject(existingData) ? "object" : existingData))
 
         editTCPEntryWindow := WindowOTF()
+        LogMessage("Creating TCP entry window.")
 
         editTCPEntryWindow.Add("GroupBox", "r4 w300", "Serveur TCP")
 
@@ -52,11 +103,15 @@ class ManagerTCP extends WindowOTF {
         editTCPEntryWindow.Add("Text", "xm+10 yp+30 w40", "Port:")
         EditPort := editTCPEntryWindow.Add("Edit", "x+5 w80")
 
+        LogMessage("UI elements added to TCP entry window.")
+
         ; Pré-remplissage
         if (IsObject(existingData)) {
             try DDLIP.Choose(DDLIP.FindString(existingData[1]))
-            catch 
+            catch {
+                LogMessage("IP not found in dropdown, defaulting to first entry.")
                 DDLIP.Choose(1)
+            }
 
             EditPort.Value := existingData[2]
         } else {
@@ -67,49 +122,77 @@ class ManagerTCP extends WindowOTF {
         BtnOK.OnEvent("Click", AddEntry)
 
         editTCPEntryWindow.Show()
+        LogMessage("TCP entry window displayed.")
 
-        ; ===== Validation =====
-
+        /**
+         * @description Validates if a given string is a valid IP address.
+         * @param {String} ip - The IP address to validate.
+         * @returns {Boolean} - `true` if valid, `false` otherwise.
+         */
         IsValidIP(ip) {
             return RegExMatch(ip, "^(\d{1,3}\.){3}\d{1,3}$")
         }
 
+        /**
+         * @description Validates and processes the TCP entry form data.
+         * @returns {void}
+         */
         AddEntry(*) {
+            LogMessage("AddEntry() started. Validating form data.")
             if (DDLIP.Text = "" || EditPort.Value = "") {
+                LogMessage("ERROR: Required fields are empty.")
                 MsgBox("Champs obligatoires manquants")
                 return
             }
 
             if (!IsValidIP(DDLIP.Text)) {
+                LogMessage("ERROR: Invalid IP address provided.")
                 MsgBox("IP invalide")
                 return
             }
 
             if (!RegExMatch(EditPort.Value, "^\d+$") || Number(EditPort.Value) > 65536) {
+                LogMessage("ERROR: Invalid port provided.")
                 MsgBox("Port invalide")
                 return
             }
 
+            LogMessage("Form data validated. Hiding window.")
             editTCPEntryWindow.Hide()
         }
 
         WinWaitClose(editTCPEntryWindow.Hwnd)
+        LogMessage("Waiting for window to close.")
 
-        if (DDLIP.Text = "" || EditPort.Value = "")
+        if (DDLIP.Text = "" || EditPort.Value = "") {
+            LogMessage("ManagerTCP.EditTCPEntry() completed. Returned: false (validation failed)")
             return false
+        }
 
-        return [DDLIP.Text, EditPort.Value]
+        result := [DDLIP.Text, EditPort.Value]
+        LogMessage("ManagerTCP.EditTCPEntry() completed. Returned TCP entry data: " . result[1] . ":" . result[2])
+        return result
     }
+
+    /**
+     * @description Opens a window for managing TCP servers (add, edit, delete, start, stop).
+     * @returns {Boolean} - `true` if the window was closed properly.
+     * @example <caption>Manage TCP servers.</caption>
+     * ManagerTCP().ManageTCPServers()
+     */
     ManageTCPServers() {
-        
+        LogMessage("ManagerTCP.ManageTCPServers() started.")
+
         for sock in SocketManager().GetListeningSockets() {
             this.AddServer(sock.ip, sock.port)
         }
+        LogMessage("Existing listening sockets loaded as servers.")
 
         LV_width := 600
 
         LV := this.Add("ListView", "w" . LV_width . " h200 Grid -Multi -ReadOnly 0x8000",
             ["IP", "Port", "Status"])
+        LogMessage("ListView added to window.")
 
         LV.ModifyCol(1, LV_width // 3-3)
         LV.ModifyCol(2, LV_width // 3-3)
@@ -120,6 +203,7 @@ class ManagerTCP extends WindowOTF {
         for server IN this.servers {
             LV.Add(, server.ip, server.port, other_service_use_port_text)
         }
+        LogMessage("Servers loaded into ListView.")
 
         btnAdd    := this.Add("Button", "w100", "Ajouter")
         btnEdit   := this.Add("Button", "x+10 w100", "Modifier")
@@ -128,10 +212,14 @@ class ManagerTCP extends WindowOTF {
         btnStop   := this.Add("Button", "x+10 w100", "Stop")
 
         this.Show()
+        LogMessage("TCP server management window displayed.")
 
-        ; ===== Actions =====
-
+        /**
+         * @description Adds a new server to the list and ListView.
+         * @returns {void}
+         */
         AddServer(*) {
+            LogMessage("AddServer() started.")
             row := LV.GetCount()+1
             data := this.EditTCPEntry()
             if (data) {
@@ -144,24 +232,34 @@ class ManagerTCP extends WindowOTF {
                 if !row_exist {
                     this.AddServer(data[1], data[2])
                     LV.Add(, data[1], data[2], (this.servers[row].IsRunning())? "running" : "stopped")
+                    LogMessage("New server added to ListView.")
                 } else {
+                    LogMessage("ERROR: Port already in use.")
                     MsgBox("Ce port est déja utilisé")
                 }
             }
         }
 
+        /**
+         * @description Edits the selected server in the ListView.
+         * @returns {void}
+         */
         EditServer(*) {
+            LogMessage("EditServer() started.")
             if !(row := LV.GetNext(0)) {
+                LogMessage("ERROR: No row selected for editing.")
                 MsgBox("Sélectionne une ligne")
                 return
             }
 
             if (LV.GetText(row, 3) = other_service_use_port_text) {
+                LogMessage("ERROR: Cannot edit, port used by another service.")
                 MsgBox("Vous ne pouvez pas utilisé cela, un autre service utilise ce port")
                 return
             }
 
             if (this.servers[row].IsRunning()){
+                LogMessage("ERROR: Cannot edit running server.")
                 MsgBox("Stoppez le serveur")
                 return
             }
@@ -170,6 +268,7 @@ class ManagerTCP extends WindowOTF {
                 LV.GetText(row, 1), ; IP
                 LV.GetText(row, 2)  ; Port
             ]
+            LogMessage("Current server data retrieved for editing.")
 
             data := this.EditTCPEntry(current)
 
@@ -177,64 +276,91 @@ class ManagerTCP extends WindowOTF {
                 this.RemoveServer(row)
                 this.InsertServer(data[1], data[2], row)
                 LV.Modify(row, , data[1], data[2], (this.servers[row].IsRunning())? "running" : "stopped")
+                LogMessage("Server updated in ListView.")
             }
         }
 
+        /**
+         * @description Deletes the selected server from the ListView and servers list.
+         * @returns {void}
+         */
         DeleteServer(*) {
+            LogMessage("DeleteServer() started.")
             if !(row := LV.GetNext(0)) {
+                LogMessage("ERROR: No row selected for deletion.")
                 MsgBox("Sélectionne une ligne")
                 return
             }
 
             if (LV.GetText(row, 3) = other_service_use_port_text) {
+                LogMessage("ERROR: Cannot delete, port used by another service.")
                 MsgBox("Vous ne pouvez pas utilisé cela, un autre service utilise ce port")
                 return
             }
 
             if (this.servers[row].IsRunning()){
+                LogMessage("ERROR: Cannot delete running server.")
                 MsgBox("Stoppez le serveur")
                 return
             }
-            
-            this.RemoveServer(row)
 
+            this.RemoveServer(row)
             LV.Delete(row)
+            LogMessage("Server deleted from ListView and servers list.")
         }
 
+        /**
+         * @description Starts the selected server.
+         * @returns {void}
+         */
         StartServer(*) {
+            LogMessage("StartServer() started.")
             if !(row := LV.GetNext(0)){
+                LogMessage("ERROR: No row selected for starting.")
                 MsgBox("Sélectionne une ligne")
                 return
             }
 
             if (LV.GetText(row, 3) = other_service_use_port_text) {
+                LogMessage("ERROR: Cannot start, port used by another service.")
                 MsgBox("Vous ne pouvez pas utilisé cela, un autre service utilise ce port")
                 return
             }
 
             if (this.servers[row].IsRunning()){
+                LogMessage("Server already running.")
                 return
             }
 
             ; On récupère l'ID en colonne 1 même s'il est invisible
             ip       := LV.GetText(row, 1)
             port     := LV.GetText(row, 2)
+            LogMessage("Starting server at IP: " . ip . ", Port: " . port)
 
             try {
                 this.servers[row].Start()
                 LV.Modify(row, , , , (this.servers[row].IsRunning())? "running" : "stopped")
+                LogMessage("Server started successfully.")
             } catch Error as e {
+                LogMessage("ERROR: Failed to start server. " . e.Message)
                 MsgBox(e.Message . " at line : " . row)
             }
         }
 
+        /**
+         * @description Stops the selected server.
+         * @returns {void}
+         */
         StopServer(*) {
+            LogMessage("StopServer() started.")
             if !(row := LV.GetNext(0)){
+                LogMessage("ERROR: No row selected for stopping.")
                 MsgBox("Sélectionne une ligne")
                 return
             }
 
             if (LV.GetText(row, 3) = other_service_use_port_text) {
+                LogMessage("ERROR: Cannot stop, port used by another service.")
                 MsgBox("Vous ne pouvez pas utilisé cela, un autre service utilise ce port")
                 return
             }
@@ -242,20 +368,23 @@ class ManagerTCP extends WindowOTF {
             try {
                 this.servers[row].Close()
                 LV.Modify(row, , , , (this.servers[row].IsRunning())? "running" : "stopped")
+                LogMessage("Server stopped successfully.")
             } catch Error as e {
+                LogMessage("ERROR: Failed to stop server. " . e.Message)
                 MsgBox(e.Message . " at line : " . row)
             }
         }
 
         ; ===== Events =====
-
         btnAdd.OnEvent("Click", (*) => AddServer())
         btnEdit.OnEvent("Click", (*) => EditServer())
         btnDelete.OnEvent("Click", (*) => DeleteServer())
         btnStart.OnEvent("Click", (*) => StartServer())
         btnStop.OnEvent("Click", (*) => StopServer())
+        LogMessage("Button events bound.")
 
         WinWaitClose(this.Hwnd)
+        LogMessage("ManagerTCP.ManageTCPServers() completed.")
         return true
     }
 }
