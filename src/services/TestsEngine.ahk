@@ -20,7 +20,6 @@ class TestsEngine {
         dest_ip   := data[4]
         port      := data[5]
         protocol  := StrUpper(data[6]) ; Standardized v2 function for uppercase
-        LogMessage("Test parameters extracted: source_ip=" . source_ip . ", dest_ip=" . dest_ip . ", port=" . port . ", protocol=" . protocol)
 
         ; 1. Verify if the source IP is one of ours
         found := false
@@ -30,17 +29,14 @@ class TestsEngine {
                 break
             }
         }
-        LogMessage("Source IP validation: " . (found ? "IP matched" : "IP not matched"))
 
         ; FIX: Removed the restrictive InStr(protocol, "TCP") check that was skipping UDP/ICMP
         if (!found) {
             data[8] := "NOT TESTED (IP MISMATCH)"
-            LogMessage("TestsEngine.executeTest() completed. Status: " . data[8])
             return data
         }
 
         status := "Failed"
-        LogMessage("Starting test execution for protocol: " . protocol)
 
         try {
             switch protocol {
@@ -66,11 +62,6 @@ class TestsEngine {
         }
 
         data[8] := status
-        LogMessage("Test status updated: " . status)
-
-        if (status != "Success" && status != "Sent/Open") {
-            try LogMessage("Test " . protocol . " failed for " . dest_ip . ":" . port)
-        }
 
         LogMessage("TestsEngine.executeTest() completed. Returned status: " . status)
         return data
@@ -88,7 +79,6 @@ class TestsEngine {
      * success := TestsEngine().TestTCP("8.8.8.8", 53)
      */
     TestTCP(ip, port, timeout := 500) {
-        LogMessage("TestsEngine.TestTCP() started. Params: ip=" . ip . ", port=" . port . ", timeout=" . timeout)
 
         ; Initialize Winsock once per call (or move to __New for better performance)
         static WSADATA := Buffer(400)
@@ -111,15 +101,12 @@ class TestsEngine {
         NumPut("Short", 2, sockaddr, 0)
         NumPut("UShort", DllCall("ws2_32\htons", "UShort", port), sockaddr, 2) ; Port
         NumPut("UInt", DllCall("ws2_32\inet_addr", "AStr", ip), sockaddr, 4) ; IP address
-        LogMessage("Socket address structure configured.")
 
         ; Set non-blocking mode
         arg := Buffer(4), NumPut("UInt", 1, arg)
         DllCall("ws2_32\ioctlsocket", "Ptr", s, "Int", 0x8004667E, "Ptr", arg)
-        LogMessage("Socket set to non-blocking mode.")
 
         DllCall("ws2_32\connect", "Ptr", s, "Ptr", sockaddr, "Int", 16) ; tentative de connexion non bloquante
-        LogMessage("Non-blocking connection attempt initiated.")
 
         ; Setup select() for timeout
         writefds := Buffer(520, 0)  ; fd_set structure: DWORD fd_count + 64 sockets (Ptr each)
@@ -128,15 +115,12 @@ class TestsEngine {
 
         timeval := Buffer(8, 0)
         NumPut("Int", 0, timeval, 0), NumPut("Int", timeout * 1000, timeval, 4)
-        LogMessage("Timeout configured: " . timeout . "ms.")
 
         res := DllCall("ws2_32\select", "Int", 0, "Ptr", 0, "Ptr", writefds, "Ptr", 0, "Ptr", timeval)
-        LogMessage("Select result: " . res)
 
         ; Cleanup
         DllCall("ws2_32\closesocket", "Ptr", s)
         DllCall("ws2_32\WSACleanup")
-        LogMessage("TCP socket and Winsock cleaned up.")
 
         result := (res > 0)
         LogMessage("TestsEngine.TestTCP() completed. Result: " . result)
@@ -151,7 +135,6 @@ class TestsEngine {
      * success := TestsEngine().TestICMP("8.8.8.8")
      */
     TestICMP(ip) {
-        LogMessage("TestsEngine.TestICMP() started. Params: ip=" . ip)
         ; Use ComSpec for a cleaner hidden execution
         result := (RunWait(A_ComSpec ' /c ping -n 1 -w 500 ' . ip, , "Hide") = 0)
         LogMessage("TestsEngine.TestICMP() completed. Result: " . result)
@@ -167,20 +150,16 @@ class TestsEngine {
      * success := TestsEngine().TestUDP("8.8.8.8", 53)
      */
     TestUDP(ip, port) {
-        LogMessage("TestsEngine.TestUDP() started. Params: ip=" . ip . ", port=" . port)
 
         static WSADATA := Buffer(400)
         DllCall("ws2_32\WSAStartup", "UShort", 0x0202, "Ptr", WSADATA)
-        LogMessage("Winsock initialized for UDP test.")
 
         s := DllCall("ws2_32\socket", "Int", 2, "Int", 2, "Int", 17, "Ptr") ; SOCK_DGRAM, IPPROTO_UDP
-        LogMessage("UDP socket created: " . s)
 
         sockaddr := Buffer(16, 0)
         NumPut("Short", 2, sockaddr, 0)
         NumPut("UShort", DllCall("ws2_32\htons", "UShort", port), sockaddr, 2)
         NumPut("UInt", DllCall("ws2_32\inet_addr", "AStr", ip), sockaddr, 4)
-        LogMessage("Socket address structure configured for UDP.")
 
         ; Note: UDP connect only checks if the local stack can reach the destination route.
         ; It does not "handshake" like TCP.
@@ -189,10 +168,8 @@ class TestsEngine {
 
         DllCall("ws2_32\closesocket", "Ptr", s)
         DllCall("ws2_32\WSACleanup")
-        LogMessage("UDP socket and Winsock cleaned up.")
 
         result := (res = 0)
-        LogMessage("TestsEngine.TestUDP() completed. Result: " . result)
         return result
     }
 }

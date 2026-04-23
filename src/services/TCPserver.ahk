@@ -12,13 +12,11 @@ class TCPServer {
      * server := TCPServer("127.0.0.1", 8080)
      */
     __New(ip := "0.0.0.0", port := 12345) {
-        LogMessage("TCPServer.__New() started. Params: ip=" . ip . ", port=" . port)
         this.ip := ip
         this.port := port
         this.listenSocket := 0
         this.clients := []
         this.timer := 0
-        LogMessage("TCPServer.__New() completed. Server initialized.")
     }
 
     /**
@@ -29,10 +27,8 @@ class TCPServer {
      * server.Start()
      */
     Start() {
-        LogMessage("TCPServer.Start() started.")
 
         ; Init Winsock
-        LogMessage("Initializing Winsock.")
         wsa := Buffer(394)
         if (DllCall("ws2_32\WSAStartup", "UShort", 0x202, "Ptr", wsa) != 0) {
             LogMessage("ERROR in TCPServer.Start(): WSAStartup failed.")
@@ -40,14 +36,11 @@ class TCPServer {
         }
 
         ; Create socket
-        LogMessage("Creating socket.")
         this.listenSocket := DllCall("ws2_32\socket", "Int", 2, "Int", 1, "Int", 6, "Ptr")
-        LogMessage("Socket created: " . this.listenSocket)
 
         ; Non-blocking
         mode := 1
         DllCall("ws2_32\ioctlsocket", "Ptr", this.listenSocket, "UInt", 0x8004667E, "UInt*", mode)
-        LogMessage("Socket set to non-blocking mode.")
 
         ; Bind
         LogMessage("Binding socket to IP: " . this.ip . ", Port: " . this.port)
@@ -62,12 +55,11 @@ class TCPServer {
         }
 
         DllCall("ws2_32\listen", "Ptr", this.listenSocket, "Int", 10)
-        LogMessage("Socket listening for connections.")
 
         ; Timer loop
         this.timer := ObjBindMethod(this, "_loop")
         SetTimer(this.timer, 50)
-        LogMessage("TCPServer.Start() completed. Timer set for socket loop.")
+        LogMessage("TCPServer.Start() completed.")
     }
 
     /**
@@ -77,9 +69,7 @@ class TCPServer {
      * isRunning := server.IsRunning()
      */
     IsRunning() {
-        LogMessage("TCPServer.IsRunning() called.")
         result := this.listenSocket != 0 && this.timer != 0
-        LogMessage("TCPServer.IsRunning() returned: " . result)
         return result
     }
 
@@ -89,7 +79,6 @@ class TCPServer {
      * @example <caption>Internal method, called automatically by the timer.</caption>
      */
     _loop() {
-        LogMessage("TCPServer._loop() started.")
 
         ; --- fd_set init ---
         fdset := Buffer(4 + (64 * A_PtrSize), 0)
@@ -98,14 +87,12 @@ class TCPServer {
         ; Add listen socket (if valid)
         if (this.listenSocket) {
             this._fdsetAdd(fdset, this.listenSocket)
-            LogMessage("Added listen socket to fd_set.")
         }
 
         ; Add clients
         for client in this.clients {
             this._fdsetAdd(fdset, client)
         }
-        LogMessage("Added " . this.clients.Length . " clients to fd_set.")
 
         ; --- timeout (non-blocking) ---
         tv := Buffer(8, 0)
@@ -120,7 +107,6 @@ class TCPServer {
             , "Ptr", tv)
 
         if (res <= 0) {
-            LogMessage("TCPServer._loop() completed. No activity detected.")
             return
         }
 
@@ -181,7 +167,6 @@ class TCPServer {
 
             i++
         }
-        LogMessage("TCPServer._loop() completed.")
     }
 
     /**
@@ -191,7 +176,6 @@ class TCPServer {
      * server.Close()
      */
     Close() {
-        LogMessage("TCPServer.Close() started.")
 
         if (this.timer) {
             SetTimer(this.timer, 0)
@@ -203,12 +187,10 @@ class TCPServer {
             DllCall("ws2_32\closesocket", "Ptr", client)
         }
         this.clients := []
-        LogMessage("All client sockets closed.")
 
         if (this.listenSocket) {
             DllCall("ws2_32\closesocket", "Ptr", this.listenSocket)
             this.listenSocket := 0
-            LogMessage("Listen socket closed.")
         }
 
         DllCall("ws2_32\WSACleanup")
@@ -269,7 +251,6 @@ class SocketManager {
      * sockets := SocketManager().GetListeningSockets()
      */
     GetListeningSockets() {
-        LogMessage("SocketManager.GetListeningSockets() started.")
         result := []
 
         AF_INET := 2
@@ -278,7 +259,6 @@ class SocketManager {
         size := 0
 
         ; Get required size
-        LogMessage("Determining buffer size for TCP table.")
         DllCall("iphlpapi\GetExtendedTcpTable"
             , "ptr", 0
             , "uint*", &size
@@ -290,7 +270,6 @@ class SocketManager {
         buf := Buffer(size, 0)
 
         ; Retrieve data
-        LogMessage("Retrieving TCP table data.")
         if DllCall("iphlpapi\GetExtendedTcpTable"
             , "ptr", buf
             , "uint*", &size

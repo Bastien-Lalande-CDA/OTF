@@ -25,11 +25,10 @@ if (!FileExist(LogFile)) {
  * Main()
  */
 Main() {
-    LogMessage("Main() started.")
     LogMessage("OTF started - v" . AppVersion)
 
     Controller().startScript()
-    LogMessage("Main() completed.")
+    LogMessage("Program completed.")
 }
 
 Main()

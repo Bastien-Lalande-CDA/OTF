@@ -12,23 +12,19 @@ class ScreenLoading extends WindowOTF {
      * loadingScreen := ScreenLoading(10)
      */
     __New(totalTests) {
-        LogMessage("ScreenLoading.__New() started. Params: totalTests=" . totalTests)
         super.__New()
 
         this.totalTests := totalTests
 
         CloseWindow(*) {
-            LogMessage("ScreenLoading window closed by user.")
             ExitApp()
         }
         this.OnEvent("Close", CloseWindow)
 
         this.Add("Text", "vProgressText w300", "Progression : 0 / " . totalTests)
         this.Add("Progress", "vProgressBar w300 h20 cGreen Range0-" . totalTests, 0)
-        LogMessage("Progress bar and text added to loading screen.")
 
         this.Show()
-        LogMessage("ScreenLoading.__New() completed. Loading screen displayed.")
     }
 
     /**
@@ -39,10 +35,8 @@ class ScreenLoading extends WindowOTF {
      * loadingScreen.Update(5)
      */
     Update(currentTest) {
-        LogMessage("ScreenLoading.Update() started. Params: currentTest=" . currentTest)
         this["ProgressBar"].Value := currentTest
         this["ProgressText"].Text := "Progression : " . currentTest . " / " . this.totalTests
-        LogMessage("ScreenLoading.Update() completed. Progress updated.")
     }
 
     /**
@@ -52,8 +46,6 @@ class ScreenLoading extends WindowOTF {
      * loadingScreen.Close()
      */
     Close() {
-        LogMessage("ScreenLoading.Close() started.")
         this.Destroy()
-        LogMessage("ScreenLoading.Close() completed. Loading screen destroyed.")
     }
 }

@@ -17,9 +17,7 @@ class HMI extends Object {
      * dataType := HMI().askDataType()
      */
     askDataType() {
-        LogMessage("HMI.askDataType() started.")
         result := DialogueRadio().GetOpt()
-        LogMessage("HMI.askDataType() completed. Returned: " . result)
         return result
     }
 
@@ -30,9 +28,7 @@ class HMI extends Object {
      * filePath := HMI().askPath()
      */
     askPath() {
-        LogMessage("HMI.askPath() started.")
         result := DialogueGetPath().GetPath()
-        LogMessage("HMI.askPath() completed. Returned: " . result)
         return result
     }
 
@@ -44,9 +40,7 @@ class HMI extends Object {
      * matrixData := HMI().manageMatrixData([["Header1", "Header2"], ["Value1", "Value2"]])
      */
     manageMatrixData(input_data := []) {
-        LogMessage("HMI.manageMatrixData() started. Params: input_data length=" . input_data.Length)
         result := ManagerMatrix().GetFinalMatrix(input_data)
-        LogMessage("HMI.manageMatrixData() completed. Returned matrix data.")
         return result
     }
 
@@ -58,9 +52,7 @@ class HMI extends Object {
      * userConfirmed := HMI().showResults([["Header1", "Header2"], ["Result1", "Result2"]])
      */
     showResults(data) {
-        LogMessage("HMI.showResults() started. Params: data length=" . data.Length)
         result := ScreenResults().ShowResults(data)
-        LogMessage("HMI.showResults() completed. Returned: " . result)
         return result
     }
 
@@ -72,9 +64,7 @@ class HMI extends Object {
      * HMI().initLoadingScreen(10)
      */
     initLoadingScreen(totalTests) {
-        LogMessage("HMI.initLoadingScreen() started. Params: totalTests=" . totalTests)
         this.window_loading := ScreenLoading(totalTests)
-        LogMessage("HMI.initLoadingScreen() completed. Loading screen initialized.")
     }
 
     /**
@@ -85,9 +75,7 @@ class HMI extends Object {
      * HMI().updateLoadingScreen(5)
      */
     updateLoadingScreen(currentTest) {
-        LogMessage("HMI.updateLoadingScreen() started. Params: currentTest=" . currentTest)
         this.window_loading.Update(currentTest)
-        LogMessage("HMI.updateLoadingScreen() completed. Progress updated.")
     }
 
     /**
@@ -97,9 +85,7 @@ class HMI extends Object {
      * HMI().closeLoadingScreen()
      */
     closeLoadingScreen() {
-        LogMessage("HMI.closeLoadingScreen() started.")
         this.window_loading.Close()
-        LogMessage("HMI.closeLoadingScreen() completed. Loading screen closed.")
     }
 
     /**
@@ -109,8 +95,6 @@ class HMI extends Object {
      * HMI().manageTCPServers()
      */
     manageTCPServers() {
-        LogMessage("HMI.manageTCPServers() started.")
         ManagerTCP().ManageTCPServers()
-        LogMessage("HMI.manageTCPServers() completed. TCP server management initiated.")
     }
 }

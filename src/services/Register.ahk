@@ -10,10 +10,8 @@ class Register extends Object {
      * Register().registerTests([["header1", "header2"], [["value1", "value2"], ["value3", "value4"]]])
      */
     registerTests(results, ouptut_path := A_ScriptDir . "\outputs\results.csv") {
-        LogMessage("Register.registerTests() started. Params: ouptut_path=" . ouptut_path)
 
         csvContent := ""
-        LogMessage("Building CSV content from headers and data.")
 
         ; Build header row
         for index, header in results[1] {
@@ -27,8 +25,6 @@ class Register extends Object {
             }
         }
 
-        LogMessage("Writing CSV content to file: " . ouptut_path)
         FileAppend(csvContent, ouptut_path)
-        LogMessage("Register.registerTests() completed. CSV file written successfully.")
     }
 }

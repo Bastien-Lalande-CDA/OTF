@@ -10,19 +10,12 @@ class WindowOTF extends Gui {
      * window := WindowOTF()
      */
     __New(){
-        LogMessage("WindowOTF.__New() started.")
         TraySetIcon(A_ScriptDir . "\src\image\par-feu.png")
-        LogMessage("Tray icon set.")
 
         this.window_title := AppName . " - v" . AppVersion
-        LogMessage("Window title set: " . this.window_title)
 
         super.__New("-MinimizeBox -MaximizeBox", this.window_title)
-        LogMessage("Base GUI initialized with title: " . this.window_title)
 
         this.Add("Picture", "h20 w-1", A_ScriptDir . "\src\image\logo-chantiers-atlantique.png")
-        LogMessage("Logo picture added to window.")
-
-        LogMessage("WindowOTF.__New() completed.")
     }
 }

@@ -10,7 +10,6 @@ class DialogueRadio extends WindowOTF {
      * selectedOption := DialogueRadio().GetOpt()
      */
     GetOpt() {
-        LogMessage("DialogueRadio.GetOpt() started.")
 
         CloseWindow(*) {
             LogMessage("DialogueRadio window closed by user.")
@@ -18,7 +17,6 @@ class DialogueRadio extends WindowOTF {
         }
         this.OnEvent("Close", CloseWindow)
 
-        LogMessage("Adding UI elements to dialog.")
         this.Add("Text", "", "Sélectionez une option :")
         radio1 := this.Add("Radio", "vDataType1 Checked", "Importer une matrice de flux (CSV)")
         radio2 := this.Add("Radio", "vDataType2", "Créer une nouvelle matrice de flux")
@@ -26,16 +24,13 @@ class DialogueRadio extends WindowOTF {
         btn := this.Add("Button", "xm w390 Default", "OK")
 
         OkButton(*){
-            LogMessage("OK button clicked. Hiding dialog.")
             this.Hide()
         }
         btn.OnEvent("Click", OkButton)
 
         this.Show()
-        LogMessage("Dialog window displayed.")
 
         WinWaitClose(this.Hwnd)
-        LogMessage("Waiting for window to close.")
 
         opt := 0
         if (radio1.Value) {
@@ -50,7 +45,6 @@ class DialogueRadio extends WindowOTF {
         }
 
         this.Destroy()
-        LogMessage("DialogueRadio.GetOpt() completed. Returned option: " . opt)
         return opt
     }
 }

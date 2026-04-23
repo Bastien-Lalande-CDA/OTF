@@ -16,7 +16,6 @@ class Parser extends Object {
      * }
      */
     parseCSV(filePath, nb_entete := 1, delimiter := ";") {
-        LogMessage("Parser.parseCSV() started. Params: filePath=" . filePath . ", nb_entete=" . nb_entete . ", delimiter=" . delimiter)
 
         if !FileExist(filePath) {
             LogMessage("ERROR in Parser.parseCSV(): File not found at path: " . filePath)
@@ -24,7 +23,6 @@ class Parser extends Object {
             return false
         }
 
-        LogMessage("Reading file content from: " . filePath)
         fileContent := FileRead(filePath, "UTF-8")
         dataArray := []
         headers := []
@@ -51,7 +49,6 @@ class Parser extends Object {
         }
 
         expexted_headers := ["source_name","source_ip","destination_name","destination_ip","designation_port","protocol","service_name","status"]
-        LogMessage("Validating CSV headers against expected format.")
 
         ; Trim and validate each header
         for index, header in headers {

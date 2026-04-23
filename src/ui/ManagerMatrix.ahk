@@ -11,10 +11,8 @@ class ManagerMatrix extends WindowOTF {
      * entryData := ManagerMatrix().EditMatrixEntry(["Source1", "192.168.1.1", "Dest1", "192.168.1.2", "80", "TCP", "HTTP"])
      */
     EditMatrixEntry(existingData := "") {
-        LogMessage("ManagerMatrix.EditMatrixEntry() started. Params: existingData=" . (IsObject(existingData) ? "object" : existingData))
 
         window := WindowOTF()
-        LogMessage("Creating matrix entry window.")
 
         window.Add("GroupBox", "r6 w620", "Ajouter une nouvelle entrée")
 
@@ -39,10 +37,7 @@ class ManagerMatrix extends WindowOTF {
         window.Add("Text", "x+15 w50", "Service:")
         EditService := window.Add("Edit", "vService x+5 w100")
 
-        LogMessage("UI elements added to matrix entry window.")
-
         if (IsObject(existingData)) {
-            LogMessage("Pre-filling form with existing data.")
             EditSrcName.Value := existingData[1]
             EditSrcIP.Value   := existingData[2]
             EditDstName.Value := existingData[3]
@@ -51,13 +46,11 @@ class ManagerMatrix extends WindowOTF {
 
             try DDLProto.Choose(existingData[6])
             catch {
-                LogMessage("Protocol not found in dropdown, defaulting to TCP.")
                 DDLProto.Choose(1)
             }
 
             EditService.Value := existingData[7]
         } else {
-            LogMessage("No existing data provided. Using defaults.")
             EditSrcIP.Value := (SysGetIPAddresses().Length > 0) ? SysGetIPAddresses()[1] : ""
             DDLProto.Choose(1)
         }
@@ -66,7 +59,6 @@ class ManagerMatrix extends WindowOTF {
         BtnAdd.OnEvent("Click", AddEntry)
 
         window.Show()
-        LogMessage("Matrix entry window displayed.")
 
         /**
          * @description Validates if a given string is a valid IP address.
@@ -100,39 +92,31 @@ class ManagerMatrix extends WindowOTF {
          * @returns {void}
          */
         AddEntry(*) {
-            LogMessage("AddEntry() started. Validating form data.")
             if (EditSrcIP.Value = "" || EditDstIP.Value = "" || EditPort.Value = "" || DDLProto.Text = "") {
-                LogMessage("ERROR: Required fields are empty.")
                 MsgBox("Veuillez remplir les champs obligatoires.", "Erreur", "Icon! 4096")
                 return
             }
 
             if (!IsValidIP(EditSrcIP.Value) || !IsValidIP(EditDstIP.Value)) {
-                LogMessage("ERROR: Invalid IP addresses provided.")
                 MsgBox("Veuillez entrer des adresses IP valides.", "Erreur")
                 return
             }
 
             if (!IsNumber(EditPort.Value)) {
-                LogMessage("ERROR: Port is not a number.")
                 MsgBox("Le port doit être un nombre.", "Erreur")
                 return
             }
 
-            LogMessage("Form data validated. Hiding window.")
             window.Hide()
         }
 
         WinWaitClose(window.Hwnd)
-        LogMessage("Waiting for window to close.")
 
         if (EditSrcIP.Value = "" || EditDstIP.Value = "" || EditPort.Value = "" || DDLProto.Text = "") {
-            LogMessage("ManagerMatrix.EditMatrixEntry() completed. Returned: false (validation failed)")
             return false
         }
 
-        result := [EditSrcName.Value, EditSrcIP.Value, EditDstName.Value, EditDstIP.Value, EditPort.Value, DDLProto.Text, EditService.Value, "NON TESTÉ"]
-        LogMessage("ManagerMatrix.EditMatrixEntry() completed. Returned entry data.")
+        result := [EditSrcName.Value, EditSrcIP.Value, EditDstName.Value, EditDstIP.Value, EditPort.Value, DDLProto.Text, EditService.Value, ""]
         return result
     }
 
@@ -144,25 +128,20 @@ class ManagerMatrix extends WindowOTF {
      * matrixData := ManagerMatrix().GetFinalMatrix([["Header1", "Header2"], ["Value1", "Value2"]])
      */
     GetFinalMatrix(input_data := []) {
-        LogMessage("ManagerMatrix.GetFinalMatrix() started. Params: input_data length=" . input_data.Length)
 
         headers := ["source_name","source_ip","destination_name","destination_ip","designation_port","protocol","service_name","status"]
-        LogMessage("Headers defined for matrix.")
 
         tab_headers := headers.Clone()
         tab_headers.RemoveAt(tab_headers.Length)
 
         window := WindowOTF()
-        LogMessage("Creating matrix management window.")
 
         LV := window.Add("ListView", "r15 w600 Grid -Multi -ReadOnly", tab_headers)
-        LogMessage("ListView added to window.")
 
         for row in input_data {
             LV.Add(, row*)
         }
         LV.ModifyCol()
-        LogMessage("Input data loaded into ListView.")
 
         window.Add("Button", "w120", "Ajouter").OnEvent("Click", (*) => AddRow())
         window.Add("Button", "x+10 w120", "Modifier").OnEvent("Click", (*) => EditRow())
@@ -175,19 +154,16 @@ class ManagerMatrix extends WindowOTF {
         }
         window.OnEvent("Close", CloseWindow)
         window.Show()
-        LogMessage("Matrix management window displayed.")
 
         /**
          * @description Adds a new row to the matrix.
          * @returns {void}
          */
         AddRow(*) {
-            LogMessage("AddRow() started.")
             data := this.EditMatrixEntry()
             if (data) {
                 LV.Add(, data*)
                 LV.ModifyCol()
-                LogMessage("New row added to ListView.")
             }
         }
 
@@ -196,9 +172,7 @@ class ManagerMatrix extends WindowOTF {
          * @returns {void}
          */
         EditRow(*) {
-            LogMessage("EditRow() started.")
             if !(RowNum := LV.GetNext(0)) {
-                LogMessage("No row selected for editing.")
                 MsgBox("Veuillez sélectionner une ligne à modifier.", "Info")
                 return
             }
@@ -207,14 +181,12 @@ class ManagerMatrix extends WindowOTF {
             Loop headers.Length {
                 CurrentRowData.Push(LV.GetText(RowNum, A_Index))
             }
-            LogMessage("Current row data retrieved for editing.")
 
             newData := this.EditMatrixEntry(CurrentRowData)
 
             if (newData) {
                 LV.Modify(RowNum, , newData*)
                 LV.ModifyCol()
-                LogMessage("Row updated in ListView.")
             }
         }
 
@@ -223,12 +195,9 @@ class ManagerMatrix extends WindowOTF {
          * @returns {void}
          */
         DeleteSelected(*) {
-            LogMessage("DeleteSelected() started.")
             if RowNum := LV.GetNext(0) {
                 LV.Delete(RowNum)
-                LogMessage("Selected row deleted.")
             } else {
-                LogMessage("No row selected for deletion.")
                 MsgBox("Veuillez sélectionner une ligne à supprimer.", "Info")
             }
         }
@@ -238,12 +207,10 @@ class ManagerMatrix extends WindowOTF {
          * @returns {void}
          */
         ProcessData(*) {
-            LogMessage("ProcessData() started. Hiding window.")
             window.Hide()
         }
 
         WinWaitClose(window.Hwnd)
-        LogMessage("Waiting for window to close.")
 
         SavedData := []
         Loop LV.GetCount() {
@@ -254,10 +221,8 @@ class ManagerMatrix extends WindowOTF {
             }
             SavedData.Push(RowDetails)
         }
-        LogMessage("Matrix data saved. Total rows: " . SavedData.Length)
 
         data_tab := [headers, SavedData]
-        LogMessage("ManagerMatrix.GetFinalMatrix() completed. Returned matrix data.")
 
         window.Destroy()
         return data_tab

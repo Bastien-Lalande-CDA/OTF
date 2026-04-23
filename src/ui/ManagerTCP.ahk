@@ -15,14 +15,13 @@ class ManagerTCP extends WindowOTF {
      * server := ManagerTCP().AddServer("192.168.1.1", 8080)
      */
     AddServer(ip := "0.0.0.0", port := 80) {
-        LogMessage("ManagerTCP.AddServer() started. Params: ip=" . ip . ", port=" . port)
         if (this.servers.Has(ip) && this.servers.Has(port)) {
             LogMessage("ERROR: Server with this IP and port already exists.")
         }
 
         server := TCPServer(ip, port)
         this.servers.Push(server)
-        LogMessage("ManagerTCP.AddServer() completed. Server added.")
+        LogMessage("ManagerTCP.AddServer() completed. Server added. Params: ip=" . ip . ", port=" . port)
         return server
     }
 
@@ -36,50 +35,31 @@ class ManagerTCP extends WindowOTF {
      * server := ManagerTCP().InsertServer("192.168.1.1", 8080, 1)
      */
     InsertServer(ip := "0.0.0.0", port := 80, index := 1) {
-        LogMessage("ManagerTCP.InsertServer() started. Params: ip=" . ip . ", port=" . port . ", index=" . index)
         if (this.servers.Has(ip) && this.servers.Has(port)) {
             LogMessage("ERROR: Server with this IP and port already exists.")
         }
 
         server := TCPServer(ip, port)
         this.servers.InsertAt(index, server)
-        LogMessage("ManagerTCP.InsertServer() completed. Server inserted at index " . index)
+        LogMessage("ManagerTCP.InsertServer() completed. Server inserted. Params: ip=" . ip . ", port=" . port . ", index=" . index)
         return server
     }
 
     /**
-     * @description Retrieves a server by its ID.
-     * @param {Number} id - The index of the server in the servers list.
-     * @returns {TCPServer|void} - The server instance if found, otherwise undefined.
-     * @example <caption>Get server at index 0.</caption>
-     * server := ManagerTCP().GetServer(0)
-     */
-    GetServer(id) {
-        LogMessage("ManagerTCP.GetServer() started. Params: id=" . id)
-        if !this.servers.Has(id) {
-            LogMessage("ERROR: No server found with this id: " . id)
-        }
-
-        LogMessage("ManagerTCP.GetServer() completed.")
-        return this.servers[id]
-    }
-
-    /**
      * @description Removes a server by its ID and closes its socket.
-     * @param {Number} id - The index of the server in the servers list.
+     * @param {Number} index - The index of the server in the servers list.
      * @returns {void}
      * @example <caption>Remove server at index 0.</caption>
      * ManagerTCP().RemoveServer(0)
      */
-    RemoveServer(id) {
-        LogMessage("ManagerTCP.RemoveServer() started. Params: id=" . id)
-        if !this.servers.Has(id) {
-            LogMessage("ERROR: No server found with this id: " . id)
+    RemoveServer(index) {
+        if !this.servers.Has(index) {
+            LogMessage("ERROR: No server found with this id: " . index)
         }
 
-        this.servers[id].Close()
-        this.servers.RemoveAt(id)
-        LogMessage("ManagerTCP.RemoveServer() completed. Server removed and closed.")
+        this.servers[index].Close()
+        this.servers.RemoveAt(index)
+        LogMessage("ManagerTCP.RemoveServer() completed. Server at index " . index . " removed and closed.")
     }
 
     /**
@@ -90,10 +70,8 @@ class ManagerTCP extends WindowOTF {
      * tcpData := ManagerTCP().EditTCPEntry(["192.168.1.1", 8080])
      */
     EditTCPEntry(existingData := ["",80]) {
-        LogMessage("ManagerTCP.EditTCPEntry() started. Params: existingData=" . (IsObject(existingData) ? "object" : existingData))
 
         editTCPEntryWindow := WindowOTF()
-        LogMessage("Creating TCP entry window.")
 
         editTCPEntryWindow.Add("GroupBox", "r4 w300", "Serveur TCP")
 
@@ -102,8 +80,6 @@ class ManagerTCP extends WindowOTF {
 
         editTCPEntryWindow.Add("Text", "xm+10 yp+30 w40", "Port:")
         EditPort := editTCPEntryWindow.Add("Edit", "x+5 w80")
-
-        LogMessage("UI elements added to TCP entry window.")
 
         ; Pré-remplissage
         if (IsObject(existingData)) {
@@ -122,7 +98,6 @@ class ManagerTCP extends WindowOTF {
         BtnOK.OnEvent("Click", AddEntry)
 
         editTCPEntryWindow.Show()
-        LogMessage("TCP entry window displayed.")
 
         /**
          * @description Validates if a given string is a valid IP address.
@@ -138,7 +113,6 @@ class ManagerTCP extends WindowOTF {
          * @returns {void}
          */
         AddEntry(*) {
-            LogMessage("AddEntry() started. Validating form data.")
             if (DDLIP.Text = "" || EditPort.Value = "") {
                 LogMessage("ERROR: Required fields are empty.")
                 MsgBox("Champs obligatoires manquants")
@@ -157,12 +131,10 @@ class ManagerTCP extends WindowOTF {
                 return
             }
 
-            LogMessage("Form data validated. Hiding window.")
             editTCPEntryWindow.Hide()
         }
 
         WinWaitClose(editTCPEntryWindow.Hwnd)
-        LogMessage("Waiting for window to close.")
 
         if (DDLIP.Text = "" || EditPort.Value = "") {
             LogMessage("ManagerTCP.EditTCPEntry() completed. Returned: false (validation failed)")
@@ -181,18 +153,15 @@ class ManagerTCP extends WindowOTF {
      * ManagerTCP().ManageTCPServers()
      */
     ManageTCPServers() {
-        LogMessage("ManagerTCP.ManageTCPServers() started.")
 
         for sock in SocketManager().GetListeningSockets() {
             this.AddServer(sock.ip, sock.port)
         }
-        LogMessage("Existing listening sockets loaded as servers.")
 
         LV_width := 600
 
         LV := this.Add("ListView", "w" . LV_width . " h200 Grid -Multi -ReadOnly 0x8000",
             ["IP", "Port", "Status"])
-        LogMessage("ListView added to window.")
 
         LV.ModifyCol(1, LV_width // 3-3)
         LV.ModifyCol(2, LV_width // 3-3)
@@ -203,7 +172,6 @@ class ManagerTCP extends WindowOTF {
         for server IN this.servers {
             LV.Add(, server.ip, server.port, other_service_use_port_text)
         }
-        LogMessage("Servers loaded into ListView.")
 
         btnAdd    := this.Add("Button", "w100", "Ajouter")
         btnEdit   := this.Add("Button", "x+10 w100", "Modifier")
@@ -212,14 +180,12 @@ class ManagerTCP extends WindowOTF {
         btnStop   := this.Add("Button", "x+10 w100", "Stop")
 
         this.Show()
-        LogMessage("TCP server management window displayed.")
 
         /**
          * @description Adds a new server to the list and ListView.
          * @returns {void}
          */
         AddServer(*) {
-            LogMessage("AddServer() started.")
             row := LV.GetCount()+1
             data := this.EditTCPEntry()
             if (data) {
@@ -245,7 +211,6 @@ class ManagerTCP extends WindowOTF {
          * @returns {void}
          */
         EditServer(*) {
-            LogMessage("EditServer() started.")
             if !(row := LV.GetNext(0)) {
                 LogMessage("ERROR: No row selected for editing.")
                 MsgBox("Sélectionne une ligne")
@@ -268,7 +233,6 @@ class ManagerTCP extends WindowOTF {
                 LV.GetText(row, 1), ; IP
                 LV.GetText(row, 2)  ; Port
             ]
-            LogMessage("Current server data retrieved for editing.")
 
             data := this.EditTCPEntry(current)
 
@@ -276,7 +240,6 @@ class ManagerTCP extends WindowOTF {
                 this.RemoveServer(row)
                 this.InsertServer(data[1], data[2], row)
                 LV.Modify(row, , data[1], data[2], (this.servers[row].IsRunning())? "running" : "stopped")
-                LogMessage("Server updated in ListView.")
             }
         }
 
@@ -285,7 +248,6 @@ class ManagerTCP extends WindowOTF {
          * @returns {void}
          */
         DeleteServer(*) {
-            LogMessage("DeleteServer() started.")
             if !(row := LV.GetNext(0)) {
                 LogMessage("ERROR: No row selected for deletion.")
                 MsgBox("Sélectionne une ligne")
@@ -306,7 +268,6 @@ class ManagerTCP extends WindowOTF {
 
             this.RemoveServer(row)
             LV.Delete(row)
-            LogMessage("Server deleted from ListView and servers list.")
         }
 
         /**
@@ -314,7 +275,6 @@ class ManagerTCP extends WindowOTF {
          * @returns {void}
          */
         StartServer(*) {
-            LogMessage("StartServer() started.")
             if !(row := LV.GetNext(0)){
                 LogMessage("ERROR: No row selected for starting.")
                 MsgBox("Sélectionne une ligne")
@@ -328,7 +288,6 @@ class ManagerTCP extends WindowOTF {
             }
 
             if (this.servers[row].IsRunning()){
-                LogMessage("Server already running.")
                 return
             }
 
@@ -340,7 +299,6 @@ class ManagerTCP extends WindowOTF {
             try {
                 this.servers[row].Start()
                 LV.Modify(row, , , , (this.servers[row].IsRunning())? "running" : "stopped")
-                LogMessage("Server started successfully.")
             } catch Error as e {
                 LogMessage("ERROR: Failed to start server. " . e.Message)
                 MsgBox(e.Message . " at line : " . row)
@@ -352,7 +310,6 @@ class ManagerTCP extends WindowOTF {
          * @returns {void}
          */
         StopServer(*) {
-            LogMessage("StopServer() started.")
             if !(row := LV.GetNext(0)){
                 LogMessage("ERROR: No row selected for stopping.")
                 MsgBox("Sélectionne une ligne")
@@ -368,7 +325,6 @@ class ManagerTCP extends WindowOTF {
             try {
                 this.servers[row].Close()
                 LV.Modify(row, , , , (this.servers[row].IsRunning())? "running" : "stopped")
-                LogMessage("Server stopped successfully.")
             } catch Error as e {
                 LogMessage("ERROR: Failed to stop server. " . e.Message)
                 MsgBox(e.Message . " at line : " . row)
@@ -381,10 +337,8 @@ class ManagerTCP extends WindowOTF {
         btnDelete.OnEvent("Click", (*) => DeleteServer())
         btnStart.OnEvent("Click", (*) => StartServer())
         btnStop.OnEvent("Click", (*) => StopServer())
-        LogMessage("Button events bound.")
 
         WinWaitClose(this.Hwnd)
-        LogMessage("ManagerTCP.ManageTCPServers() completed.")
         return true
     }
 }

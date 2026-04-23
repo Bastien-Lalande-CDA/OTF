@@ -14,12 +14,10 @@ class Controller {
      * controller := Controller()
      */
     __New() {
-        LogMessage("Controller.__New() started.")
         this.parser := Parser()
         this.testEngine := TestsEngine()
         this.register := Register()
         this.hmi := HMI()
-        LogMessage("Controller.__New() completed. Instances of Parser, TestsEngine, Register, and HMI created.")
     }
 
     /**
@@ -29,9 +27,7 @@ class Controller {
      * controller.startScript()
      */
     startScript() {
-        LogMessage("Controller.startScript() started.")
         this.runWorkflow()
-        LogMessage("Controller.startScript() completed.")
     }
 
     /**
@@ -41,10 +37,7 @@ class Controller {
      * controller.runWorkflow()
      */
     runWorkflow() {
-        LogMessage("Controller.runWorkflow() started.")
-
         data_type := this.hmi.askDataType() ; 1=CSV import, 2=Matrix editing, 3=TCP server management
-        LogMessage("Data type selected: " . data_type)
         input_data := ""
 
         if (data_type = 1) {
@@ -52,8 +45,9 @@ class Controller {
             conform_csv_col := false
 
             while (!conform_csv_col) {
+
+                LogMessage("CSV path requested.")
                 csv_path := this.hmi.askPath() ; Ask for CSV file path
-                LogMessage("CSV path requested: " . csv_path)
 
                 csv_data := this.parser.parseCSV(csv_path) ; Parse the CSV file
                 LogMessage("CSV parsing attempted for path: " . csv_path)
@@ -78,7 +72,7 @@ class Controller {
         } else if (data_type = 3) {
             LogMessage("Processing TCP server management workflow.")
             this.hmi.manageTCPServers() ; Manage TCP server creation and data reception
-            LogMessage("Controller.runWorkflow() completed. TCP server management initiated.")
+            LogMessage("Program completed.")
             ExitApp()
 
         } else {
@@ -95,7 +89,6 @@ class Controller {
         LogMessage("Total tests to execute: " . totalTests)
 
         this.hmi.initLoadingScreen(totalTests) ; Initialize the loading screen
-        LogMessage("Loading screen initialized.")
 
         my_ips := SysGetIPAddresses()
 
@@ -103,23 +96,19 @@ class Controller {
             result := this.testEngine.executeTest(row, my_ips) ; Execute tests on each row of data
             test_results.Push(result)
             this.hmi.updateLoadingScreen(i) ; Update the loading screen after each test
-            LogMessage("Test completed for row " . i)
+            LogMessage("Test completed " . i . "/" . totalTests)
         }
 
         this.hmi.closeLoadingScreen()
-        LogMessage("Loading screen closed. All tests executed.")
+        LogMessage("All tests executed.")
 
         results_tab := [input_data[1], test_results] ; Combine headers with results
-        LogMessage("Results tabulated.")
 
         if this.hmi.showResults(results_tab) {
-            LogMessage("Saving results to file.")
             this.register.registerTests(input_data, A_ScriptDir . "\outputs\results_" . FormatTime(A_Now, 'yyyyMMdd_HHmmss') . ".csv")
             LogMessage("Results saved at: " . A_ScriptDir . "\outputs\results_" . FormatTime(A_Now, 'yyyyMMdd_HHmmss') . ".csv")
         } else {
-            LogMessage("Results not saved. User declined.")
+            LogMessage("Results not saved.")
         }
-
-        LogMessage("Controller.runWorkflow() completed.")
     }
 }

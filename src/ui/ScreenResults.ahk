@@ -11,7 +11,6 @@ class ScreenResults extends WindowOTF {
      * ScreenResults().ShowResults([["Header1", "Header2"], ["Value1", "Success"], ["Value2", "Failed"]])
      */
     ShowResults(data) {
-        LogMessage("ScreenResults.ShowResults() started. Params: data length=" . data.Length)
 
         CloseWindow(*) {
             LogMessage("ScreenResults window closed by user.")
@@ -21,10 +20,8 @@ class ScreenResults extends WindowOTF {
 
         headers := data[1]
         rows := data[2]
-        LogMessage("Headers and rows extracted from data.")
 
         SortArray(rows, CompareStatus, 8)
-        LogMessage("Rows sorted by status.")
 
         /**
          * @description Compares two rows based on their status for sorting.
@@ -46,7 +43,6 @@ class ScreenResults extends WindowOTF {
          * @returns {void}
          */
         SortArray(arr, cmp, col) {
-            LogMessage("SortArray() started. Sorting array of length: " . arr.Length)
             len := arr.Length
             Loop len - 1 {
                 i := A_Index
@@ -59,12 +55,10 @@ class ScreenResults extends WindowOTF {
                     }
                 }
             }
-            LogMessage("SortArray() completed.")
         }
 
         nb_of_success := 0
         nb_of_fail := 0
-        LogMessage("Calculating success and failure statistics.")
         for row in rows {
             if (row[8] = "Success") {
                 nb_of_success++
@@ -73,19 +67,15 @@ class ScreenResults extends WindowOTF {
                 nb_of_fail++
             }
         }
-        LogMessage("Statistics calculated: " . nb_of_success . " successes, " . nb_of_fail . " failures.")
 
         main_txt := "Date: "
         . FormatTime(A_Now, 'yyyy-MM-dd') . "  |  "
         . nb_of_success . "/"  . rows.Length . " tests réussis [" . Format("{:.2f}", (nb_of_success / rows.Length) * 100) . "%]" . "  |  "
         . nb_of_fail . "/"  . rows.Length . " échecs [" . Format("{:.2f}", (nb_of_fail / rows.Length) * 100) . "%]"
-        LogMessage("Summary text generated.")
 
         this.Add("Text",, main_txt)
-        LogMessage("Summary text added to window.")
 
         lv := this.Add("ListView", "r20 w800 Grid NoSortHdr NoSort", headers)
-        LogMessage("ListView created with headers.")
 
         lv.Opt("-Redraw")
         for rowData in rows {
@@ -93,22 +83,17 @@ class ScreenResults extends WindowOTF {
         }
         lv.Opt("+Redraw")
         lv.ModifyCol()
-        LogMessage("Rows added to ListView and columns modified.")
 
         CloseBtn := this.Add("Button", "xm w800 Default", "Enregistrer les résultats")
         SaveBtn(*) {
-            LogMessage("Save button clicked. Hiding window.")
             this.Hide()
         }
         CloseBtn.OnEvent("Click", SaveBtn )
-        LogMessage("Save button added and event bound.")
 
         this.Show()
-        LogMessage("ScreenResults window displayed.")
 
         WinWaitClose(this.Hwnd)
         this.Destroy()
-        LogMessage("ScreenResults.ShowResults() completed. Window destroyed.")
         return true
     }
 }
