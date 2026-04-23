@@ -1,2 +1,3 @@
 outputs/*
-!outputs/logs/
+!outputs/logs
+outputs/logs/*
