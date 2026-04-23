@@ -3,7 +3,7 @@
 ; Global Configuration
 global AppVersion := "3.0"
 global AppName := "OTF"
-global LogFile := A_ScriptDir . "\outputs\logs\otf.log"
+global LogFile := A_ScriptDir . "\outputs\logs\OTF_log_" . FormatTime(A_Now, "yyyyMMdd") . ".log"
 
 /**
  * @description Logs a message with a timestamp to the specified log file.

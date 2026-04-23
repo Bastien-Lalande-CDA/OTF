@@ -6,9 +6,6 @@
 
 ; OTF.ahk - Main script for OTF (Outil de Test de Flux)
 
-; Global log file path
-LogFile := A_ScriptDir . "\outputs\logs\script_log_" . FormatTime(A_Now, "yyyyMMdd") . ".txt"
-
 ; Create directories if they don't exist
 if (!DirExist(A_ScriptDir . "\outputs")) {
     DirCreate(A_ScriptDir . "\outputs")
