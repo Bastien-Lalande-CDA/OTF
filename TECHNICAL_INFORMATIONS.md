@@ -1,4 +1,4 @@
-![Logo chantiers de l'atantique](/src/image/logo-chantiers-atlantique.svg)
+![Logo chantiers de l'atantique](/src/image/logo-chantiers-atlantique.png)
 
 # Documentation technique du Script : OTF (Outil de Test de Flux)
 
