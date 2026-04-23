@@ -1,0 +1,20 @@
+source_name;source_ip;destination_name;destination_ip;designation_port;protocol;service_name;status
+Traceing machine/Tracante;10.99.0.82;MRP server;10.99.0.114;1433;TCP;MS SQL Server;
+MRP Server;10.99.0.114;Traceing machine - EkoInfo;10.99.0.82;80;TCP;WebApplication;
+Traceing machine/Tracante;10.99.0.82;SRVNTP;10.21.92.226;123;TCP;NTP;
+Traceing machine/Tracante;10.99.0.82;srvcertif3;10.21.92.189;8530;TCP;WSUS;
+Traceing machine/Tracante;10.99.0.82;srvwsuspdt2;10.21.96.77;8530;TCP;;
+Traceing machine/Tracante;10.99.0.82;A0-DCDNS01;10.21.92.100;53;TCP;DNS;
+Traceing machine/Tracante;10.99.0.82;L0-DCDNS01;10.21.96.100;53;TCP;;
+Traceing machine/Tracante;10.99.0.82;nlb-cashub01;10.21.103.8;27;TCP;SMTP;
+Traceing machine/Tracante;10.99.0.82;srvdatacm.casn.net;10.21.21.37;445;TCP;SMB;
+Traceing machine/Tracante;10.99.0.82;srvacronisprod.casn.net;10.21.96.26;445;TCP;SMB;
+MRP Server;10.99.0.114;Traceing machine - EkoInfo;10.99.0.82;62548;TCP;OPCUA;
+Traceing machine - EkoInfo;10.99.0.82;MRP Server;10.99.0.114;62548;TCP;OPCUA;
+MS-PC-ECHANGES;10.99.0.115;Traceing machine - EkoInfo;10.99.0.82;4840;TCP;OPCUA;
+MS-PC-ECHANGES;10.99.0.116;Traceing machine - EkoInfo;10.99.0.83;49320;TCP;OPCUA;
+Traceing machine - EkoInfo;10.99.0.82;MS-PC-ECHANGES;10.99.0.115;4840;TCP;OPCUA;
+Traceing machine - EkoInfo;10.99.0.83;MS-PC-ECHANGES;10.99.0.116;49320;TCP;OPCUA;
+PC ECHANGES;10.99.0.115;Tracing machine;10.99.0.82;62548;TCP;MicroStep OPC UA Server;
+Tracing machine (user);10.99.0.82;MRP Server;10.99.0.114;80;TCP;WebApplication;
+PC ECHANGES;10.99.0.115;Tracing machine;10.99.0.82;80;TCP;WebApplication;
