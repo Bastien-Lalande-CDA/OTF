@@ -17,7 +17,7 @@ class ScreenLoading extends WindowOTF {
 
         this.totalTests := totalTests
 
-        CloseWindow() {
+        CloseWindow(*) {
             LogMessage("ScreenLoading window closed by user.")
             ExitApp()
         }

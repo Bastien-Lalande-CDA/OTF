@@ -31,9 +31,8 @@ Main() {
     LogMessage("Main() started.")
     LogMessage("OTF started - v" . AppVersion)
 
-    c := Controller()
-    LogMessage("Controller instance created.")
-
-    c.startScript()
+    Controller().startScript()
     LogMessage("Main() completed.")
 }
+
+Main()

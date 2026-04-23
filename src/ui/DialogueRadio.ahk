@@ -12,7 +12,7 @@ class DialogueRadio extends WindowOTF {
     GetOpt() {
         LogMessage("DialogueRadio.GetOpt() started.")
 
-        CloseWindow() {
+        CloseWindow(*) {
             LogMessage("DialogueRadio window closed by user.")
             ExitApp()
         }
@@ -25,7 +25,7 @@ class DialogueRadio extends WindowOTF {
         radio3 := this.Add("Radio", "vDataType3", "Créer un serveur TCP")
         btn := this.Add("Button", "xm w390 Default", "OK")
 
-        OkButton(){
+        OkButton(*){
             LogMessage("OK button clicked. Hiding dialog.")
             this.Hide()
         }

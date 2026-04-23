@@ -13,7 +13,7 @@ class ScreenResults extends WindowOTF {
     ShowResults(data) {
         LogMessage("ScreenResults.ShowResults() started. Params: data length=" . data.Length)
 
-        CloseWindow() {
+        CloseWindow(*) {
             LogMessage("ScreenResults window closed by user.")
             ExitApp()
         }
@@ -96,7 +96,7 @@ class ScreenResults extends WindowOTF {
         LogMessage("Rows added to ListView and columns modified.")
 
         CloseBtn := this.Add("Button", "xm w800 Default", "Enregistrer les résultats")
-        SaveBtn() {
+        SaveBtn(*) {
             LogMessage("Save button clicked. Hiding window.")
             this.Hide()
         }

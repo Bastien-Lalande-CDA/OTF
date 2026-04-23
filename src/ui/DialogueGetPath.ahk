@@ -12,11 +12,10 @@ class DialogueGetPath extends WindowOTF {
     GetPath() {
         LogMessage("DialogueGetPath.GetPath() started.")
 
-        CloseWindow() {
+        CloseWindow(*) {
             LogMessage("DialogueGetPath window closed by user.")
             ExitApp()
         }
-
         this.OnEvent("Close", CloseWindow)
 
         path := ""

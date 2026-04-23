@@ -169,7 +169,7 @@ class ManagerMatrix extends WindowOTF {
         window.Add("Button", "x+10 w120", "Supprimer").OnEvent("Click", (*) => DeleteSelected())
         window.Add("Button", "xm w600 Default", "Exécuter les tests").OnEvent("Click", ProcessData)
 
-        CloseWindow() {
+        CloseWindow(*) {
             LogMessage("Matrix management window closed by user.")
             ExitApp()
         }

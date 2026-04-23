@@ -98,10 +98,8 @@ class Controller {
         LogMessage("Loading screen initialized.")
 
         my_ips := SysGetIPAddresses()
-        LogMessage("System IP addresses retrieved: " . my_ips)
 
         for i, row in rows {
-            LogMessage("Executing test for row " . i . ": " . row)
             result := this.testEngine.executeTest(row, my_ips) ; Execute tests on each row of data
             test_results.Push(result)
             this.hmi.updateLoadingScreen(i) ; Update the loading screen after each test
