@@ -57,8 +57,6 @@ class Parser extends Object {
                 return false
             }
         }
-
-        LogMessage("Parser.parseCSV() completed. Headers and data parsed successfully.")
         return [headers, dataArray]
     }
 }
