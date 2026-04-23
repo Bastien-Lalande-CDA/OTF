@@ -1,8 +1,8 @@
 ﻿#Requires AutoHotkey v2.0
 #SingleInstance Force
 
-#Include src\Controller.ahk
-#Include src\Globals.ahk
+#Include src/controllers/Controller.ahk
+#Include src/Globals.ahk
 
 ; OTF.ahk - Main script for OTF (Outil de Test de Flux)
 

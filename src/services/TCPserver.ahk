@@ -1,43 +1,6 @@
 #Requires AutoHotkey v2.0
 
-#Include Globals.ahk
-
-class TCPServers {
-    servers := []
-
-    Add(ip := "0.0.0.0", port := 80) {
-        if (this.servers.Has(ip) && this.servers.Has(port))
-            LogMessage("Server with this name already exists")
-
-        server := TCPServer(ip, port)
-        this.servers.Push(server)
-        return server
-    }
-
-    Insert(ip := "0.0.0.0", port := 80, index := 1) {
-        if (this.servers.Has(ip) && this.servers.Has(port))
-            LogMessage("Server with this name already exists")
-
-        server := TCPServer(ip, port)
-        this.servers.InsertAt(index, server)
-        return server
-    }
-
-    Get(id) {
-        if !this.servers.Has(id)
-            LogMessage("No server found with this id")
-
-        return this.servers[id]
-    }
-
-    Remove(id) {
-        if !this.servers.Has(id)
-            LogMessage("No server found with this id")
-
-        this.servers[id].Close()
-        this.servers.RemoveAt(id)
-    }
-}
+#Include ../Globals.ahk
 
 class TCPServer {
     __New(ip := "0.0.0.0", port := 12345) {

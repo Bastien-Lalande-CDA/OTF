@@ -1,10 +1,10 @@
 #Requires AutoHotkey v2.0
 
-#Include HMI.ahk
-#Include Parser.ahk
-#Include Register.ahk
-#Include TestsEngine.ahk
-#Include Globals.ahk
+#Include ../ui/HMI.ahk
+#Include ../services/Parser.ahk
+#Include ../services/Register.ahk
+#Include ../services/TestsEngine.ahk
+#Include ../Globals.ahk
 
 
 class Controller {
@@ -42,10 +42,10 @@ class Controller {
                 }
             }
 
-            input_data := this.hmi.editMatrixData(csv_data[2]) ; Allow user to edit the parsed data
+            input_data := this.hmi.manageMatrixData(csv_data[2]) ; Allow user to edit the parsed data
 
         } else if (data_type = 2) {
-            input_data := this.hmi.editMatrixData() ; Ask for matrix data input
+            input_data := this.hmi.manageMatrixData() ; Ask for matrix data input
 
         } else if (data_type = 3) {
 
@@ -71,7 +71,7 @@ class Controller {
         for i, row in rows {
             result := this.testEngine.executeTest(row, my_ips) ; Execute tests on each row of data
             test_results.Push(result)
-            this.hmi.updateLoadingScreen(i,totalTests) ; Update the loading screen after each test
+            this.hmi.updateLoadingScreen(i) ; Update the loading screen after each test
         }
         this.hmi.closeLoadingScreen()
 

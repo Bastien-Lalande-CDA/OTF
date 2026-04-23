@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-#Include Globals.ahk
+#Include ../Globals.ahk
 
 class TestsEngine {
     
