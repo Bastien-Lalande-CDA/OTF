@@ -34,7 +34,7 @@ class Parser extends Object {
             columns := StrSplit(A_LoopField, delimiter)
 
             if (A_Index <= 1) {
-                headers := Trim(columns)
+                headers := columns
                 continue
             }
 
