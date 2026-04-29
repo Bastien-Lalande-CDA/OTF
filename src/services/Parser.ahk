@@ -15,7 +15,7 @@ class Parser extends Object {
      *     data := parsedData[2]
      * }
      */
-    parseCSV(filePath, nb_entete := 1, delimiter := ";") {
+    parseCSV(filePath, delimiter := ";") {
 
         if !FileExist(filePath) {
             LogMessage("ERROR in Parser.parseCSV(): File not found at path: " . filePath)
@@ -33,8 +33,8 @@ class Parser extends Object {
 
             columns := StrSplit(A_LoopField, delimiter)
 
-            if (A_Index <= nb_entete) {
-                headers := columns
+            if (A_Index <= 1) {
+                headers := Trim(columns)
                 continue
             }
 
@@ -42,6 +42,7 @@ class Parser extends Object {
             rowObject := []
             for index, headerName in headers {
                 val := columns.Has(index) ? columns[index] : ""
+                val := Trim(val)
                 rowObject.Push(val)
             }
 

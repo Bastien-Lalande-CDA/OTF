@@ -1,3 +1,4 @@
 outputs/*
 !outputs/logs
 outputs/logs/*
+*.pptx
